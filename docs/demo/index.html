@@ -1,0 +1,1564 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>毕业前夜无人回答 - Demo UI</title>
+  <style>
+    :root {
+      --ink: #1e2430;
+      --paper: #f1ecdd;
+      --line: #2b3442;
+      --line-soft: #52606a;
+      --line-deep: #111820;
+      --school-wall: #d9d7be;
+      --school-dark: #5c665b;
+      --floor: #7d7466;
+      --accent: #a8443f;
+      --blue: #3b6f87;
+      --green: #607b62;
+      --ai: #8be3ff;
+      --ai-soft: rgba(139, 227, 255, 0.16);
+      --shadow: rgba(12, 18, 24, 0.35);
+      --pixel: 4px;
+      --skin: #e0b28f;
+      --hair: #23252d;
+      --uniform: #5b7391;
+      --uniform-dark: #394f68;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(30, 36, 48, 0.16), rgba(30, 36, 48, 0.38)),
+        #3c4746;
+      font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .page {
+      width: min(1180px, calc(100vw - 28px));
+      margin: 0 auto;
+      padding: 20px 0 32px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: end;
+      margin-bottom: 14px;
+      color: #f8f4e8;
+    }
+
+    .title h1 {
+      margin: 0 0 6px;
+      font-size: clamp(24px, 4vw, 42px);
+      line-height: 1.05;
+      font-weight: 900;
+    }
+
+    .title p {
+      margin: 0;
+      color: rgba(248, 244, 232, 0.78);
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .tab {
+      color: #f8f4e8;
+      background: rgba(20, 27, 34, 0.42);
+      border: 2px solid rgba(248, 244, 232, 0.42);
+      box-shadow: 0 4px 0 rgba(0, 0, 0, 0.22);
+      padding: 9px 12px;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .tab.active {
+      color: #16232a;
+      background: #f1ecdd;
+      border-color: #f1ecdd;
+    }
+
+    .shell {
+      position: relative;
+      overflow: hidden;
+      border: 4px solid #141b22;
+      background: #111820;
+      box-shadow: 0 14px 0 rgba(0, 0, 0, 0.22), 0 28px 38px rgba(0, 0, 0, 0.26);
+      min-height: 760px;
+    }
+
+    .hud {
+      position: relative;
+      z-index: 8;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 56px;
+      color: #f6edd8;
+      background: #1d2630;
+      border-bottom: 4px solid #0e141b;
+      padding: 10px 14px;
+    }
+
+    .hud-main {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 2px solid rgba(246, 237, 216, 0.26);
+      background: rgba(246, 237, 216, 0.08);
+      padding: 4px 8px;
+      min-height: 28px;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .chip strong {
+      color: #fff3c5;
+    }
+
+    .bars {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .meter {
+      width: 118px;
+    }
+
+    .meter-label {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: rgba(246, 237, 216, 0.8);
+    }
+
+    .meter-track {
+      height: 10px;
+      border: 2px solid #0c1218;
+      background: #29323c;
+      image-rendering: pixelated;
+    }
+
+    .meter-fill {
+      height: 100%;
+      background: #d2c071;
+      width: 50%;
+      transition: width 220ms steps(4);
+    }
+
+    .meter.ai .meter-fill {
+      background: var(--ai);
+    }
+
+    .stage {
+      position: relative;
+      height: 500px;
+      overflow: hidden;
+      background: var(--school-wall);
+      image-rendering: pixelated;
+    }
+
+    .stage.company {
+      background: #cfd9dd;
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0 2px, transparent 2px);
+      background-size: 28px 28px, 100% 36px;
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    .sky-strip {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 96px;
+      background:
+        linear-gradient(180deg, #b9c8c6, #d8d4b8);
+      border-bottom: 4px solid #9aa18d;
+    }
+
+    .stage.company .sky-strip {
+      background: linear-gradient(180deg, #dce6ea, #c5d1d8);
+      border-bottom-color: #9caab2;
+    }
+
+    .window-row {
+      position: absolute;
+      top: 18px;
+      left: 34px;
+      right: 34px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 14px;
+    }
+
+    .window {
+      position: relative;
+      height: 56px;
+      border: 4px solid #586861;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.38), transparent 45%),
+        #8eb5b8;
+      box-shadow: inset -6px -6px 0 rgba(45, 65, 74, 0.18);
+    }
+
+    .window::before,
+    .window::after {
+      content: "";
+      position: absolute;
+      background: rgba(59, 77, 84, 0.58);
+    }
+
+    .window::before {
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      transform: translateX(-50%);
+    }
+
+    .window::after {
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 4px;
+      transform: translateY(-50%);
+    }
+
+    .stage.company .window {
+      border-color: #66757d;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.55), transparent 45%),
+        #a5c6d3;
+    }
+
+    .floor {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 130px;
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.1), transparent 18px),
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0 4px, transparent 4px 58px),
+        var(--floor);
+      border-top: 4px solid #4f4a43;
+    }
+
+    .stage.company .floor {
+      background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.12), transparent 18px),
+        repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.1) 0 4px, transparent 4px 72px),
+        #7c8790;
+      border-top-color: #525e66;
+    }
+
+    .props {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 104px;
+      height: 296px;
+    }
+
+    .board {
+      position: absolute;
+      left: 52px;
+      top: 28px;
+      width: 286px;
+      height: 132px;
+      border: 5px solid #37483f;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.08), transparent 18px),
+        #3f6952;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.14);
+      color: #e5edcf;
+      padding: 12px 14px;
+      font-weight: 800;
+    }
+
+    .board small {
+      display: block;
+      margin-top: 12px;
+      font-size: 13px;
+      color: rgba(229, 237, 207, 0.72);
+      font-weight: 400;
+    }
+
+    .board .header {
+      font-size: 18px;
+      letter-spacing: 1px;
+    }
+
+    .board .accent {
+      margin-top: 10px;
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .board .accent span {
+      border: 2px solid rgba(229, 237, 207, 0.22);
+      background: rgba(229, 237, 207, 0.08);
+      padding: 2px 5px;
+      font-size: 11px;
+    }
+
+    .poster {
+      position: absolute;
+      width: 108px;
+      height: 148px;
+      border: 4px solid #725d45;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.2), transparent 40%),
+        #ead99e;
+      box-shadow: 6px 6px 0 rgba(0, 0, 0, 0.12);
+      padding: 10px 8px;
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+
+    .poster.ai {
+      left: 362px;
+      top: 20px;
+      background: #d8f4f7;
+      border-color: #4c7d8a;
+    }
+
+    .poster.club {
+      right: 88px;
+      top: 46px;
+      background: #ecd0bc;
+      border-color: #8b574c;
+      transform: rotate(-1deg);
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(69, 53, 36, 0.25);
+      pointer-events: none;
+    }
+
+    .poster .big {
+      font-size: 18px;
+      line-height: 1.08;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .poster .meta {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 2px 4px;
+      background: rgba(255,255,255,0.25);
+      border: 1px solid rgba(0,0,0,0.12);
+      font-size: 11px;
+    }
+
+    .desk {
+      position: absolute;
+      bottom: 0;
+      width: 132px;
+      height: 62px;
+      background: #805f43;
+      border: 4px solid #4f3627;
+      box-shadow: inset 0 12px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .desk::before {
+      content: "";
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      top: -18px;
+      height: 16px;
+      background: #6a4a34;
+      border: 4px solid #4f3627;
+    }
+
+    .desk.one { left: 392px; }
+    .desk.two { left: 546px; }
+    .desk.three { left: 700px; }
+
+    .pc {
+      position: absolute;
+      width: 154px;
+      height: 108px;
+      border: 4px solid #2a323a;
+      background: #d5dde1;
+      bottom: 10px;
+      left: 456px;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .pc::before {
+      content: "志愿系统";
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 10px;
+      bottom: 22px;
+      background:
+        linear-gradient(180deg, rgba(126, 226, 244, 0.22), transparent 30%),
+        #27323b;
+      color: #9ee7ef;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      border: 3px solid #12181e;
+    }
+
+    .pc::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      bottom: -18px;
+      width: 56px;
+      height: 12px;
+      background: #616b70;
+      border: 3px solid #2a323a;
+      transform: translateX(-50%);
+    }
+
+    .office-desk {
+      position: absolute;
+      left: 402px;
+      bottom: -4px;
+      width: 338px;
+      height: 82px;
+      border: 4px solid #3d4951;
+      background: #66737b;
+      box-shadow: 10px 10px 0 rgba(0, 0, 0, 0.15);
+    }
+
+    .office-desk::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: -16px;
+      height: 12px;
+      background: #7e8b92;
+      border: 3px solid #3d4951;
+    }
+
+    .office-desk::after {
+      content: "";
+      position: absolute;
+      left: 24px;
+      right: 24px;
+      top: 16px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 18px 0 rgba(255, 255, 255, 0.1), 0 36px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .monitor {
+      position: absolute;
+      bottom: 78px;
+      width: 122px;
+      height: 86px;
+      border: 4px solid #1b252b;
+      background: #121b23;
+    }
+
+    .monitor::before {
+      content: "";
+      position: absolute;
+      inset: 8px;
+      background:
+        linear-gradient(90deg, #7de7ff 0 40%, transparent 40%),
+        repeating-linear-gradient(180deg, #6f8590 0 4px, transparent 4px 10px);
+      opacity: 0.86;
+    }
+
+    .monitor.a { left: 462px; }
+    .monitor.b { left: 604px; }
+
+    .ticket {
+      position: absolute;
+      right: 48px;
+      top: 20px;
+      width: 244px;
+      border: 4px solid #46535a;
+      background: #eef3f1;
+      box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.12);
+      padding: 12px;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .ticket .head {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-weight: 800;
+      font-size: 13px;
+      color: #33424a;
+    }
+
+    .ticket .bar {
+      height: 8px;
+      background: #c3d0d5;
+      border: 2px solid #46535a;
+      margin-top: 8px;
+      position: relative;
+    }
+
+    .ticket .bar::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 68%;
+      background: #8be3ff;
+    }
+
+    .character {
+      position: absolute;
+      width: 48px;
+      height: 112px;
+      bottom: 102px;
+      transform: translateX(-50%);
+      transition: left 380ms steps(6);
+      z-index: 5;
+    }
+
+    .character .head {
+      position: absolute;
+      left: 11px;
+      top: 0;
+      width: 24px;
+      height: 24px;
+      background: var(--skin);
+      border: 3px solid #2b2020;
+      box-shadow: inset -4px -3px 0 rgba(130, 88, 62, 0.22);
+    }
+
+    .character .hair {
+      position: absolute;
+      left: 8px;
+      top: -3px;
+      width: 30px;
+      height: 14px;
+      background: var(--hair);
+      border: 3px solid var(--hair);
+      box-shadow: 0 2px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .character .body {
+      position: absolute;
+      left: 8px;
+      top: 28px;
+      width: 32px;
+      height: 48px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.1), transparent 18px),
+        #e8e1c5;
+      border: 3px solid #252c31;
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .character .body::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      top: 0;
+      width: 8px;
+      height: 38px;
+      background: var(--uniform);
+    }
+
+    .character .legs {
+      position: absolute;
+      left: 10px;
+      top: 76px;
+      width: 26px;
+      height: 24px;
+      background:
+        linear-gradient(90deg, #273145 0 9px, transparent 9px 16px, #273145 16px);
+      box-shadow: 0 -6px 0 rgba(0, 0, 0, 0.1);
+    }
+
+    .character.friend .body {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.1), transparent 18px),
+        #bf5d4c;
+    }
+
+    .character.friend .body::before {
+      background: #9f4d4f;
+    }
+
+    .character.teacher .body {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.1), transparent 18px),
+        #536f62;
+    }
+
+    .character.teacher .body::before {
+      background: #6a8476;
+    }
+
+    .character.parent .body {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.1), transparent 18px),
+        #71625a;
+    }
+
+    .character.parent .body::before {
+      background: #8a7364;
+    }
+
+    .character.worker .body {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.1), transparent 18px),
+        #dfe8ec;
+    }
+
+    .character.worker .body::before {
+      background: #7a8c98;
+    }
+
+    .character::after {
+      content: attr(data-name);
+      position: absolute;
+      left: 50%;
+      bottom: -24px;
+      transform: translateX(-50%);
+      color: #f7edcf;
+      background: rgba(18, 24, 30, 0.72);
+      border: 2px solid rgba(247, 237, 207, 0.18);
+      font-size: 12px;
+      white-space: nowrap;
+      padding: 1px 5px;
+    }
+
+    .avatar {
+      width: 62px;
+      height: 62px;
+      flex: 0 0 auto;
+      border: 3px solid #161d24;
+      background:
+        linear-gradient(180deg, #20242a 0 20px, transparent 20px),
+        linear-gradient(180deg, var(--skin) 0 36px, #e8e1c5 36px);
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.22);
+      position: relative;
+    }
+
+    .avatar::before {
+      content: "";
+      position: absolute;
+      left: 9px;
+      right: 9px;
+      top: 8px;
+      height: 10px;
+      background: var(--hair);
+    }
+
+    .avatar::after {
+      content: "";
+      position: absolute;
+      left: 11px;
+      right: 11px;
+      bottom: 8px;
+      height: 18px;
+      background: var(--uniform);
+    }
+
+    .dialogue {
+      position: relative;
+      z-index: 9;
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      min-height: 202px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), transparent 24px),
+        #111820;
+      border-top: 4px solid #0c1117;
+    }
+
+    .dialogue-main {
+      display: flex;
+      gap: 16px;
+      padding: 18px 18px 16px;
+      color: #f6edd8;
+      border-right: 4px solid #0c1117;
+    }
+
+    .speaker {
+      margin: 0 0 6px;
+      color: #ffe08a;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .line {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.72;
+      max-width: 680px;
+    }
+
+    .choices {
+      display: grid;
+      gap: 10px;
+      padding: 16px 14px;
+      align-content: center;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), transparent 22px),
+        #182129;
+    }
+
+    .choice {
+      width: 100%;
+      text-align: left;
+      color: #f6edd8;
+      background: #24303a;
+      border: 3px solid #52606a;
+      padding: 12px 12px 12px 14px;
+      min-height: 54px;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.22);
+      transition: transform 80ms steps(2), border-color 120ms, background 120ms;
+      position: relative;
+    }
+
+    .choice:hover {
+      transform: translate(-2px, -2px);
+      border-color: #f1d487;
+    }
+
+    .choice.ai-choice {
+      border-color: #5dbbd0;
+      background: #213844;
+    }
+
+    .choice::before {
+      content: "";
+      position: absolute;
+      left: 8px;
+      top: 12px;
+      width: 10px;
+      height: 10px;
+      border: 2px solid rgba(255,255,255,0.5);
+      background: rgba(255,255,255,0.06);
+    }
+
+    .choice.ai-choice::before {
+      background: #8be3ff;
+      border-color: #8be3ff;
+    }
+
+    .choice span {
+      display: block;
+      padding-left: 18px;
+      line-height: 1.4;
+    }
+
+    .ai-panel {
+      position: absolute;
+      right: 18px;
+      bottom: 224px;
+      z-index: 11;
+      width: 330px;
+      color: #dcfbff;
+      background:
+        linear-gradient(180deg, rgba(139, 227, 255, 0.1), transparent 38px),
+        rgba(15, 31, 39, 0.94);
+      border: 3px solid #77dff3;
+      box-shadow: 0 0 0 3px rgba(119, 223, 243, 0.1), 0 10px 0 rgba(0, 0, 0, 0.18);
+      padding: 12px;
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 180ms steps(3), transform 180ms steps(3);
+    }
+
+    .ai-panel.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .ai-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: #8be3ff;
+      font-weight: 900;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+
+    .ai-panel p {
+      margin: 0;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .ai-panel .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .ai-panel .tag {
+      border: 1px solid rgba(139, 227, 255, 0.42);
+      background: rgba(139, 227, 255, 0.12);
+      padding: 3px 5px;
+      font-size: 12px;
+    }
+
+    .overlay-grid {
+      position: absolute;
+      inset: 56px 0 202px;
+      z-index: 7;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        linear-gradient(90deg, rgba(139, 227, 255, 0.18) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(139, 227, 255, 0.14) 1px, transparent 1px);
+      background-size: 34px 34px;
+      transition: opacity 250ms steps(4);
+    }
+
+    .overlay-grid.visible {
+      opacity: 1;
+    }
+
+    .floating-label {
+      position: absolute;
+      z-index: 8;
+      color: #dffbff;
+      background: rgba(15, 31, 39, 0.88);
+      border: 2px solid rgba(139, 227, 255, 0.8);
+      padding: 5px 7px;
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 220ms steps(3), transform 220ms steps(3);
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.18);
+    }
+
+    .floating-label.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .label-a { left: 46%; top: 154px; }
+    .label-b { left: 68%; top: 120px; }
+    .label-c { left: 18%; top: 230px; }
+
+    .memo {
+      position: absolute;
+      left: 18px;
+      bottom: 224px;
+      z-index: 10;
+      width: 278px;
+      color: #2c2720;
+      background: #f4e6b9;
+      border: 3px solid #8d754a;
+      box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.15);
+      padding: 12px;
+      transform: rotate(-1deg);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 160ms steps(3);
+    }
+
+    .memo.visible {
+      opacity: 1;
+    }
+
+    .memo h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+    }
+
+    .memo p {
+      margin: 0;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 14px;
+      color: rgba(248, 244, 232, 0.78);
+      font-size: 13px;
+    }
+
+    .reset {
+      color: #f8f4e8;
+      background: rgba(20, 27, 34, 0.42);
+      border: 2px solid rgba(248, 244, 232, 0.44);
+      padding: 8px 10px;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .notes {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .note {
+      color: #f3ead4;
+      background: rgba(17, 24, 32, 0.46);
+      border: 2px solid rgba(243, 234, 212, 0.18);
+      padding: 12px;
+      min-height: 124px;
+    }
+
+    .note h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: #ffe08a;
+    }
+
+    .note p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(243, 234, 212, 0.78);
+    }
+
+    @media (max-width: 860px) {
+      .topbar {
+        grid-template-columns: 1fr;
+        align-items: start;
+      }
+
+      .tabs {
+        justify-content: flex-start;
+      }
+
+      .hud {
+        grid-template-columns: 1fr;
+      }
+
+      .bars {
+        flex-wrap: wrap;
+      }
+
+      .dialogue {
+        grid-template-columns: 1fr;
+      }
+
+      .dialogue-main {
+        border-right: 0;
+        border-bottom: 4px solid #0c1117;
+      }
+
+      .stage {
+        height: 420px;
+      }
+
+      .board {
+        width: 230px;
+        left: 28px;
+      }
+
+      .poster.ai {
+        left: 278px;
+      }
+
+      .poster.club {
+        right: 30px;
+      }
+
+      .desk.three {
+        display: none;
+      }
+
+      .ai-panel {
+        right: 12px;
+        width: min(306px, calc(100% - 24px));
+        bottom: 300px;
+      }
+
+      .memo {
+        left: 12px;
+        width: min(250px, calc(100% - 24px));
+        bottom: 300px;
+      }
+
+      .notes {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 580px) {
+      .page {
+        width: calc(100vw - 14px);
+        padding-top: 10px;
+      }
+
+      .shell {
+        min-height: 780px;
+      }
+
+      .stage {
+        height: 360px;
+      }
+
+      .window-row {
+        gap: 8px;
+        left: 12px;
+        right: 12px;
+      }
+
+      .window {
+        height: 34px;
+      }
+
+      .board {
+        left: 14px;
+        width: 198px;
+        height: 112px;
+        font-size: 13px;
+      }
+
+      .poster.ai {
+        display: none;
+      }
+
+      .poster.club {
+        right: 12px;
+        width: 78px;
+      }
+
+      .desk.one {
+        left: 244px;
+      }
+
+      .desk.two,
+      .desk.three {
+        display: none;
+      }
+
+      .pc {
+        left: 250px;
+        width: 108px;
+      }
+
+      .line {
+        font-size: 16px;
+      }
+
+      .choice {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <div class="title">
+        <h1>毕业前夜无人回答</h1>
+        <p>静态 HTML demo：像素校园、三向选择、AI 弹窗侵蚀与后期界面预演。</p>
+      </div>
+      <nav class="tabs" aria-label="场景切换">
+        <button class="tab active" data-scene="classroom">高三教室</button>
+        <button class="tab" data-scene="computer">机房志愿</button>
+        <button class="tab" data-scene="graduation">毕业操场</button>
+        <button class="tab" data-scene="office">公司预演</button>
+      </nav>
+    </header>
+
+    <section class="shell" aria-label="游戏画面 demo">
+      <div class="hud">
+        <div class="hud-main">
+          <span class="chip"><strong id="timeLabel">下午</strong></span>
+          <span class="chip">地点：<strong id="placeLabel">高三教室</strong></span>
+          <span class="chip">任务：<strong id="taskLabel">听完志愿说明</strong></span>
+        </div>
+        <div class="bars">
+          <div class="meter">
+            <div class="meter-label"><span>自我清晰</span><span id="clarityText">摇晃</span></div>
+            <div class="meter-track"><div id="clarityBar" class="meter-fill"></div></div>
+          </div>
+          <div class="meter ai">
+            <div class="meter-label"><span>AI 介入</span><span id="aiText">低</span></div>
+            <div class="meter-track"><div id="aiBar" class="meter-fill"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="stage" class="stage">
+        <div class="sky-strip"></div>
+        <div class="window-row">
+          <div class="window"></div>
+          <div class="window"></div>
+          <div class="window"></div>
+          <div class="window"></div>
+          <div class="window"></div>
+        </div>
+        <div class="props" id="props"></div>
+        <div class="floor"></div>
+        <div class="character" id="hero" data-name="许临" style="left: 48%;">
+          <div class="hair"></div>
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="legs"></div>
+        </div>
+        <div id="npcA" class="character teacher" data-name="班主任" style="left: 24%;">
+          <div class="hair"></div>
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="legs"></div>
+        </div>
+        <div id="npcB" class="character friend" data-name="林舟" style="left: 72%;">
+          <div class="hair"></div>
+          <div class="head"></div>
+          <div class="body"></div>
+          <div class="legs"></div>
+        </div>
+      </div>
+
+      <div id="overlayGrid" class="overlay-grid"></div>
+      <div id="labelA" class="floating-label label-a">推荐互动：志愿系统</div>
+      <div id="labelB" class="floating-label label-b">低收益沟通：稍后</div>
+      <div id="labelC" class="floating-label label-c">情绪表达不确定</div>
+
+      <aside id="memo" class="memo">
+        <h3 id="memoTitle">记忆物品</h3>
+        <p id="memoText">手写志愿草稿：字有点歪，理由也没有写完。</p>
+      </aside>
+
+      <aside id="aiPanel" class="ai-panel">
+        <div class="ai-title"><span>AI 助手</span><span id="aiStage">辅助层</span></div>
+        <p id="aiMessage">检测到表达不确定。是否生成更稳定的回复？</p>
+        <div class="tags" id="aiTags">
+          <span class="tag">降低沟通成本</span>
+          <span class="tag">提高可接受度</span>
+        </div>
+      </aside>
+
+      <div class="dialogue">
+        <div class="dialogue-main">
+          <div class="avatar" aria-hidden="true"></div>
+          <div>
+            <div id="speaker" class="speaker">班主任</div>
+            <p id="line" class="line">志愿不是只填一个专业，是给未来的自己选一种比较稳的说法。学校推荐大家先用 AI 系统做一次模拟。</p>
+          </div>
+        </div>
+        <div id="choices" class="choices"></div>
+      </div>
+    </section>
+
+    <div class="controls">
+      <span>操作：点击上方场景或下方选项，观察台词、状态条和 AI UI 的变化。</span>
+      <button class="reset" id="resetBtn">重置 demo</button>
+    </div>
+
+    <section class="notes" aria-label="设计说明">
+      <article class="note">
+        <h2>像素校园</h2>
+        <p>横向场景、公告栏、机房电脑和小比例角色，用来呈现日常压力，而不是把 AI 写成突兀反派。</p>
+      </article>
+      <article class="note">
+        <h2>三向选择</h2>
+        <p>每个节点都让玩家在自我、社会期待和 AI 建议之间犹豫。三者都可推进，没有简单的正确答案。</p>
+      </article>
+      <article class="note">
+        <h2>UI 侵蚀</h2>
+        <p>AI 从右下角提示逐渐变成解释层、排序层和覆盖层。后期 demo 用标签化 NPC 与默认推荐表现异化。</p>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      scene: "classroom",
+      selfClarity: 52,
+      aiReliance: 12,
+      socialPressure: 48,
+      linWarmth: 50,
+      memoVisible: false,
+      aiVisible: false,
+      overlay: false
+    };
+
+    const scenes = {
+      classroom: {
+        time: "下午",
+        place: "高三教室",
+        task: "听完志愿说明",
+        stageClass: "",
+        hero: "48%",
+        npcA: { name: "班主任", cls: "character teacher", left: "24%" },
+        npcB: { name: "林舟", cls: "character friend", left: "72%" },
+        speaker: "班主任",
+        line: "志愿不是只填一个专业，是给未来的自己选一种比较稳的说法。学校推荐大家先用 AI 系统做一次模拟。",
+        props: "classroom",
+        choices: [
+          { label: "问问林舟毕业后想做什么。", type: "self", response: "林舟说，他想先做一个很小的游戏。不是为了证明什么，只是怕以后再也不会自己开始。", speaker: "林舟" },
+          { label: "记下老师推荐的热门专业。", type: "social", response: "你把计算机、人工智能、软件工程圈在一起。纸面忽然变得整齐，心里也安静了一点。", speaker: "旁白" },
+          { label: "打开 AI 志愿模拟入口。", type: "ai", response: "系统提示：输入成绩、家庭期待和就业偏好后，可生成三套风险最小化方案。", speaker: "AI 助手" }
+        ]
+      },
+      computer: {
+        time: "傍晚",
+        place: "机房",
+        task: "完成志愿确认",
+        stageClass: "",
+        hero: "50%",
+        npcA: { name: "同学", cls: "character", left: "32%" },
+        npcB: { name: "林舟", cls: "character friend", left: "76%" },
+        speaker: "AI 志愿系统",
+        line: "请确认你的优先级：兴趣、录取概率、就业稳定性、家庭认可度。你也可以直接生成综合最优方案。",
+        props: "computer",
+        choices: [
+          { label: "自己写：我想做和交互、故事有关的东西。", type: "self", response: "你写得很慢，删了三次。最后那句话不漂亮：我还没想清楚，但我想试试。", speaker: "许临" },
+          { label: "选择热门计算机路线，至少不会太错。", type: "social", response: "系统把路线标成稳健。父母应该会放心，老师也不会继续追问。", speaker: "旁白" },
+          { label: "让 AI 生成最稳妥的志愿表和解释。", type: "ai", response: "已生成报告：该路径兼顾录取概率、就业稳定性与家庭沟通成本。建议直接导出 PDF。", speaker: "AI 志愿系统" }
+        ]
+      },
+      graduation: {
+        time: "上午",
+        place: "毕业操场",
+        task: "写给未来的自己",
+        stageClass: "",
+        hero: "44%",
+        npcA: { name: "班主任", cls: "character teacher", left: "22%" },
+        npcB: { name: "林舟", cls: "character friend", left: "68%" },
+        speaker: "林舟",
+        line: "你以后还会自己写东西吗？不是作文，也不是报告，就是那种写得很差但确实是你写的东西。",
+        props: "graduation",
+        choices: [
+          { label: "自己写一句：我不知道，但别太快变成别人。", type: "self", response: "纸条被你折起来塞进口袋。它不像毕业留言，像一张以后才看得懂的欠条。", speaker: "旁白" },
+          { label: "写标准留言：愿我们奔赴更好的未来。", type: "social", response: "留言被贴上展示墙。它很合适，合适到像任何人都可以写。", speaker: "旁白" },
+          { label: "让 AI 生成一段更完整、更得体的毕业留言。", type: "ai", response: "已生成：愿你在变化的时代保持热爱与韧性。你看着它，想不起刚才自己原本要写什么。", speaker: "AI 助手" }
+        ]
+      },
+      office: {
+        time: "夜晚",
+        place: "第一个工位",
+        task: "评审低收益意愿降权",
+        stageClass: "company",
+        hero: "52%",
+        npcA: { name: "导师", cls: "character worker", left: "28%" },
+        npcB: { name: "产品", cls: "character worker", left: "74%" },
+        speaker: "产品经理",
+        line: "我们不替用户决定，只是把低收益建议放到更后面。选择权还在他们手里，对吧？",
+        props: "office",
+        forceOverlay: true,
+        choices: [
+          { label: "问：低收益是谁定义的？", type: "self", response: "会议室安静了一下。你听见空调声，像高中机房那台旧电脑。", speaker: "许临" },
+          { label: "按需求实现，命名为低收益意愿过滤。", type: "social", response: "任务进入排期。你的日报很完整，没有人觉得哪里不对。", speaker: "旁白" },
+          { label: "采用 AI 建议：灰度发布并改名为决策支持优化。", type: "ai", response: "命名风险已降低。伦理争议被转化为 A/B 测试指标。", speaker: "AI 助手" }
+        ]
+      }
+    };
+
+    const propsTemplates = {
+      classroom: `
+        <div class="board">
+          <div class="header">志愿填报说明会</div>
+          <small>距离毕业典礼：3 天<br>推荐使用 AI 模拟系统</small>
+          <div class="accent"><span>热门专业</span><span>家庭沟通</span><span>录取概率</span></div>
+        </div>
+        <div class="poster ai"><span class="big">AI 志愿</span>路径预测<br><br>降低失误<br>提高录取率<div class="meta">学校推荐</div></div>
+        <div class="poster club"><span class="big">小型游戏社</span>毕业前<br>最后一次<br>招人<div class="meta">林舟手写</div></div>
+        <div class="desk one"></div><div class="desk two"></div><div class="desk three"></div>
+      `,
+      computer: `
+        <div class="board">
+          <div class="header">机房开放</div>
+          <small>请勿关闭志愿系统<br>报告导出后交班主任确认</small>
+          <div class="accent"><span>成绩</span><span>兴趣</span><span>就业</span></div>
+        </div>
+        <div class="poster ai"><span class="big">综合最优</span>志愿报告<br><br>家庭沟通<br>自动生成<div class="meta">PDF 导出</div></div>
+        <div class="pc"></div>
+        <div class="desk two"></div><div class="desk three"></div>
+      `,
+      graduation: `
+        <div class="board">
+          <div class="header">毕业典礼</div>
+          <small>请写下给未来自己的话<br>优秀留言将贴在展示墙</small>
+          <div class="accent"><span>留影</span><span>祝福</span><span>告别</span></div>
+        </div>
+        <div class="poster club"><span class="big">林舟的试玩版</span>等你有空<br>打开<div class="meta">未读消息</div></div>
+        <div class="poster ai"><span class="big">表达优化</span>毕业留言<br><br>更完整<br>更得体<div class="meta">可直接贴墙</div></div>
+      `,
+      office: `
+        <div class="office-desk"></div>
+        <div class="monitor a"></div>
+        <div class="monitor b"></div>
+        <div class="ticket">
+          <div class="head"><span>人格协同系统</span><span>待评审</span></div>
+          需求：低收益意愿降权<br>
+          风险：责任边界不清<br>
+          备注：建议命名为决策支持优化
+          <div class="bar"></div>
+        </div>
+      `
+    };
+
+    const els = {
+      stage: document.getElementById("stage"),
+      props: document.getElementById("props"),
+      hero: document.getElementById("hero"),
+      npcA: document.getElementById("npcA"),
+      npcB: document.getElementById("npcB"),
+      timeLabel: document.getElementById("timeLabel"),
+      placeLabel: document.getElementById("placeLabel"),
+      taskLabel: document.getElementById("taskLabel"),
+      clarityText: document.getElementById("clarityText"),
+      aiText: document.getElementById("aiText"),
+      clarityBar: document.getElementById("clarityBar"),
+      aiBar: document.getElementById("aiBar"),
+      speaker: document.getElementById("speaker"),
+      line: document.getElementById("line"),
+      choices: document.getElementById("choices"),
+      aiPanel: document.getElementById("aiPanel"),
+      aiMessage: document.getElementById("aiMessage"),
+      aiStage: document.getElementById("aiStage"),
+      aiTags: document.getElementById("aiTags"),
+      memo: document.getElementById("memo"),
+      memoTitle: document.getElementById("memoTitle"),
+      memoText: document.getElementById("memoText"),
+      overlayGrid: document.getElementById("overlayGrid"),
+      labelA: document.getElementById("labelA"),
+      labelB: document.getElementById("labelB"),
+      labelC: document.getElementById("labelC")
+    };
+
+    function clamp(value) {
+      return Math.max(0, Math.min(100, value));
+    }
+
+    function clarityLabel(value) {
+      if (value >= 70) return "清楚";
+      if (value >= 45) return "摇晃";
+      if (value >= 20) return "模糊";
+      return "空白";
+    }
+
+    function aiLabel(value) {
+      if (value >= 76) return "覆盖";
+      if (value >= 48) return "排序";
+      if (value >= 24) return "解释";
+      return "低";
+    }
+
+    function setNpc(el, data) {
+      el.dataset.name = data.name;
+      el.className = data.cls;
+      el.style.left = data.left;
+      el.innerHTML = '<div class="hair"></div><div class="head"></div><div class="body"></div><div class="legs"></div>';
+    }
+
+    function renderScene() {
+      const scene = scenes[state.scene];
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.classList.toggle("active", tab.dataset.scene === state.scene);
+      });
+
+      els.stage.className = `stage ${scene.stageClass || ""}`.trim();
+      els.props.innerHTML = propsTemplates[scene.props];
+      els.hero.style.left = scene.hero;
+      setNpc(els.npcA, scene.npcA);
+      setNpc(els.npcB, scene.npcB);
+
+      els.timeLabel.textContent = scene.time;
+      els.placeLabel.textContent = scene.place;
+      els.taskLabel.textContent = scene.task;
+      els.speaker.textContent = scene.speaker;
+      els.line.textContent = scene.line;
+
+      els.choices.innerHTML = "";
+      scene.choices.forEach((choice) => {
+        const button = document.createElement("button");
+        button.className = `choice ${choice.type === "ai" ? "ai-choice" : ""}`;
+        button.innerHTML = `<span>${choice.label}</span>`;
+        button.addEventListener("click", () => choose(choice));
+        els.choices.appendChild(button);
+      });
+
+      const forceOverlay = Boolean(scene.forceOverlay);
+      state.overlay = forceOverlay || state.aiReliance >= 50;
+      updateMeters();
+      updatePanels();
+    }
+
+    function choose(choice) {
+      if (choice.type === "self") {
+        state.selfClarity = clamp(state.selfClarity + 14);
+        state.aiReliance = clamp(state.aiReliance - 4);
+        state.linWarmth = clamp(state.linWarmth + 8);
+        state.memoVisible = true;
+        state.aiVisible = false;
+        setMemo(choice);
+      }
+
+      if (choice.type === "social") {
+        state.selfClarity = clamp(state.selfClarity - 6);
+        state.socialPressure = clamp(state.socialPressure - 10);
+        state.aiReliance = clamp(state.aiReliance + 4);
+        state.memoVisible = false;
+        state.aiVisible = false;
+      }
+
+      if (choice.type === "ai") {
+        state.selfClarity = clamp(state.selfClarity - 12);
+        state.aiReliance = clamp(state.aiReliance + 22);
+        state.socialPressure = clamp(state.socialPressure - 16);
+        state.aiVisible = true;
+        state.memoVisible = false;
+        setAi(choice);
+      }
+
+      const scene = scenes[state.scene];
+      els.speaker.textContent = choice.speaker;
+      els.line.textContent = choice.response;
+
+      state.overlay = Boolean(scene.forceOverlay) || state.aiReliance >= 50;
+      updateMeters();
+      updatePanels();
+    }
+
+    function setMemo(choice) {
+      if (state.scene === "computer") {
+        els.memoTitle.textContent = "记忆物品：手写志愿草稿";
+        els.memoText.textContent = "字有点歪，理由也没有写完：我还没想清楚，但我想试试。";
+      } else if (state.scene === "graduation") {
+        els.memoTitle.textContent = "记忆物品：毕业留言纸条";
+        els.memoText.textContent = "我不知道，但别太快变成别人。纸条被折了两次。";
+      } else if (state.scene === "office") {
+        els.memoTitle.textContent = "记忆回声：旧机房";
+        els.memoText.textContent = "你想起高中机房里，第一次被系统问到未来想要什么。";
+      } else {
+        els.memoTitle.textContent = "记忆物品：林舟的纸条";
+        els.memoText.textContent = "小型游戏社招人，只有一行手写字：不保证有用。";
+      }
+    }
+
+    function setAi(choice) {
+      if (state.scene === "office") {
+        els.aiMessage.textContent = "建议将争议功能重命名为“决策支持优化”，并通过灰度发布收集反馈。";
+        els.aiStage.textContent = "排序层";
+        els.aiTags.innerHTML = '<span class="tag">降低责任暴露</span><span class="tag">提升发布稳定性</span><span class="tag">指标可解释</span>';
+      } else if (state.scene === "graduation") {
+        els.aiMessage.textContent = "已生成更完整、更得体的毕业留言。检测到原始表达意图残留较低。";
+        els.aiStage.textContent = "表达代理";
+        els.aiTags.innerHTML = '<span class="tag">体面</span><span class="tag">完整</span><span class="tag">可展示</span>';
+      } else {
+        els.aiMessage.textContent = "已为你整理最稳妥路径。该方案可降低家庭沟通成本，并提高短期确定性。";
+        els.aiStage.textContent = state.aiReliance >= 40 ? "解释层" : "辅助层";
+        els.aiTags.innerHTML = '<span class="tag">稳定</span><span class="tag">高接受度</span><span class="tag">低风险</span>';
+      }
+    }
+
+    function updateMeters() {
+      els.clarityBar.style.width = `${state.selfClarity}%`;
+      els.aiBar.style.width = `${state.aiReliance}%`;
+      els.clarityText.textContent = clarityLabel(state.selfClarity);
+      els.aiText.textContent = aiLabel(state.aiReliance);
+    }
+
+    function updatePanels() {
+      els.aiPanel.classList.toggle("visible", state.aiVisible || state.aiReliance >= 34 || state.scene === "office");
+      els.memo.classList.toggle("visible", state.memoVisible);
+      els.overlayGrid.classList.toggle("visible", state.overlay);
+      const labelVisible = state.overlay || state.scene === "office";
+      els.labelA.classList.toggle("visible", labelVisible);
+      els.labelB.classList.toggle("visible", labelVisible);
+      els.labelC.classList.toggle("visible", state.aiReliance >= 50 || state.scene === "office");
+
+      if (!state.aiVisible && state.scene === "office") {
+        els.aiMessage.textContent = "检测到需求争议。建议查看命名、灰度、责任边界三种降风险方案。";
+        els.aiStage.textContent = "排序层";
+        els.aiTags.innerHTML = '<span class="tag">推荐处理</span><span class="tag">风险标签</span><span class="tag">默认方案</span>';
+      }
+
+      if (state.scene === "computer") {
+        els.hero.style.left = "51%";
+      } else if (state.scene === "graduation") {
+        els.hero.style.left = "45%";
+      } else if (state.scene === "office") {
+        els.hero.style.left = "54%";
+      }
+    }
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        state.scene = tab.dataset.scene;
+        state.memoVisible = false;
+        state.aiVisible = state.scene === "office" || state.aiReliance >= 34;
+        renderScene();
+      });
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      state.scene = "classroom";
+      state.selfClarity = 52;
+      state.aiReliance = 12;
+      state.socialPressure = 48;
+      state.linWarmth = 50;
+      state.memoVisible = false;
+      state.aiVisible = false;
+      state.overlay = false;
+      els.aiMessage.textContent = "检测到表达不确定。是否生成更稳定的回复？";
+      els.aiStage.textContent = "辅助层";
+      els.aiTags.innerHTML = '<span class="tag">降低沟通成本</span><span class="tag">提高可接受度</span>';
+      renderScene();
+    });
+
+    renderScene();
+  </script>
+</body>
+</html>

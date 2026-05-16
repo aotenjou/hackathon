@@ -1,0 +1,85 @@
+{
+  "canvas": {
+    "width": 1600,
+    "height": 900
+  },
+  "source": "res://assets/storyline/ch00_cruise_success/meta/source_1600x900.png",
+  "background": "res://assets/storyline/ch00_cruise_success/backgrounds/background_clean.png",
+  "standard_background": true,
+  "player_bounds": {
+    "x": 80,
+    "y": 430,
+    "width": 1440,
+    "height": 285
+  },
+  "elements": [
+    {
+      "id": "cruise_background",
+      "component": "standard_cruise_background",
+      "z_index": -100
+    },
+    {
+      "id": "champagne_table",
+      "component": "standard_table",
+      "position": [445, 605],
+      "anchor": "bottom_center",
+      "z_index": 10,
+      "focus_effect": "glass_sparkle"
+    },
+    {
+      "id": "hero_phone",
+      "component": "standard_character",
+      "position": [695, 705],
+      "anchor": "bottom_center",
+      "z_index": 20,
+      "motion": "idle_float"
+    },
+    {
+      "id": "success_panel",
+      "component": "standard_terminal",
+      "variant": "success",
+      "position": [920, 690],
+      "anchor": "bottom_center",
+      "z_index": 8,
+      "focus_effect": "terminal_glow"
+    },
+    {
+      "id": "starloop_badge_terminal",
+      "component": "standard_terminal",
+      "variant": "badge",
+      "position": [1490, 735],
+      "anchor": "bottom_center",
+      "z_index": 8,
+      "focus_effect": "terminal_glow"
+    }
+  ],
+  "hotspots": [
+    {
+      "id": "success_panel",
+      "name": "成功面板",
+      "target_sprite": "success_panel",
+      "position": [920, 455],
+      "radius": 110,
+      "effect": "gold_pulse",
+      "message": "成功路径评分已锁定：财富 S / 履历 S / 稳定 S / 城市 S。"
+    },
+    {
+      "id": "starloop_badge",
+      "name": "星环工牌",
+      "target_sprite": "starloop_badge_terminal",
+      "position": [1490, 500],
+      "radius": 105,
+      "effect": "blue_terminal_scan",
+      "message": "星环科技身份终端已识别。"
+    },
+    {
+      "id": "champagne",
+      "name": "香槟庆祝",
+      "target_sprite": "champagne_table",
+      "position": [430, 535],
+      "radius": 105,
+      "effect": "glass_sparkle",
+      "message": "酒杯碰响，晚宴仍在继续。"
+    }
+  ]
+}
