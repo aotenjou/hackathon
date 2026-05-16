@@ -52,7 +52,7 @@ func _refresh() -> void:
 		child.queue_free()
 
 	if _done:
-		var continue_button := _action_button("继续", "safe")
+		var continue_button := _action_button("CONTINUE", "safe")
 		continue_button.pressed.connect(func() -> void:
 			visible = false
 			encounter_finished.emit(str(_encounter.get("next_scene", "")))
@@ -61,38 +61,57 @@ func _refresh() -> void:
 		return
 
 	for action in _encounter.get("actions", []):
-		var button := _action_button(str(action.get("label", "")), str(action.get("strategy", "safe")))
+		var strategy := str(action.get("strategy", "safe"))
+		var button := _action_button(_action_label(str(action.get("label", "")), strategy), strategy)
 		var required := int(action.get("requires_preparedness", 0))
+		var relationship_requirement: Dictionary = action.get("requires_relationship", {})
 		if required > _preparedness:
 			button.disabled = true
 			button.text += "（准备不足）"
+		elif not _relationship_requirement_met(relationship_requirement):
+			button.disabled = true
+			button.text += "（关系不足）"
+		if bool(action.get("ai_recommended", false)):
+			button.text = "AI推荐：" + button.text
 		button.pressed.connect(func() -> void: _select_action(action))
 		_actions_box.add_child(button)
 
 func _select_action(action: Dictionary) -> void:
+	var strategy := str(action.get("strategy", "safe"))
 	_pressure = clampi(_pressure + int(action.get("pressure_delta", 0)), 0, 100)
-	_heart = clampi(_heart + int(action.get("heart_delta", 0)), 0, 100)
+	var heart_delta := int(action.get("heart_delta", 0))
+	if strategy == "ai":
+		heart_delta = -_game_state().get_ai_heart_cost()
+	elif heart_delta < 0:
+		heart_delta = 0
+	_heart = clampi(_heart + heart_delta, 0, 100)
 	_preparedness = clampi(_preparedness + int(action.get("preparedness_delta", 0)), 0, 100)
 	_rounds -= 1
 
 	var effects: Dictionary = action.get("effects", {})
-	_game_state().apply_effects(effects)
-	_game_state().record_choice(
+	var normalized_effects: Dictionary = _game_state().normalized_effects_for_strategy(effects, strategy)
+	_game_state().apply_effects(normalized_effects)
+	var heart_cost: int = int(_game_state().apply_ai_heart_cost(strategy))
+	var choice_result: Dictionary = _game_state().record_choice(
 		str(action.get("id", "")),
-		str(action.get("strategy", "")),
+		strategy,
 		str(action.get("label", "")),
 		str(action.get("result", "")),
+		int(action.get("profile_weight", -1)),
+		effects,
 	)
-	_game_state().log_feedback(_strategy_title(str(action.get("strategy", "safe"))), _effect_summary(effects), str(action.get("strategy", "safe")))
+	_game_state().log_feedback(_strategy_title(strategy), _effect_summary(normalized_effects, heart_cost, choice_result), strategy)
 	_body.text = str(action.get("result", ""))
 
 	if _pressure <= 0:
 		_done = true
-		_game_state().apply_effects(_encounter.get("success_effects", {}))
+		var success_effects: Dictionary = _game_state().normalized_effects_for_strategy(_encounter.get("success_effects", {}), "safe")
+		_game_state().apply_effects(success_effects)
 		_body.text += "\n\n" + str(_encounter.get("success_text", ""))
 	elif _heart <= 0 or _rounds <= 0:
 		_done = true
-		_game_state().apply_effects(_encounter.get("failure_effects", {}))
+		var failure_effects: Dictionary = _game_state().normalized_effects_for_strategy(_encounter.get("failure_effects", {}), "safe")
+		_game_state().apply_effects(failure_effects)
 		_body.text += "\n\n" + str(_encounter.get("failure_text", ""))
 
 	_refresh()
@@ -165,6 +184,11 @@ func _action_button(text: String, strategy: String) -> Button:
 	button.add_theme_stylebox_override("pressed", _panel_style(COL_PANEL_DARK, COL_GOLD_LIGHT, 4))
 	return button
 
+func _action_label(label: String, strategy: String) -> String:
+	if strategy != "ai":
+		return label
+	return "%s（心力 -%d）" % [label, int(_game_state().get_ai_heart_cost())]
+
 func _label(text: String, font_size: int, color: Color) -> Label:
 	var label := Label.new()
 	label.text = text
@@ -198,17 +222,22 @@ func _strategy_title(strategy: String) -> String:
 		"ai":
 			return "智能优化"
 		_:
-			return "稳妥执行"
+			return "社会规训"
 
-func _effect_summary(effects: Dictionary) -> String:
+func _effect_summary(effects: Dictionary, heart_cost: int = 0, choice_result: Dictionary = {}) -> String:
+	var parts: Array[String] = []
+	if heart_cost > 0:
+		parts.append("心力 -%d" % heart_cost)
+	var loss: Dictionary = choice_result.get("loss", {})
+	if not loss.is_empty():
+		parts.append(str(loss.get("summary", "现实代价出现")))
 	if effects.has("stats"):
-		var parts: Array[String] = []
 		for key in effects["stats"].keys():
 			var delta := int(effects["stats"][key])
 			if delta != 0:
 				parts.append("%s %+d" % [_stat_name(str(key)), delta])
-		if not parts.is_empty():
-			return _join_limited(parts, " / ", 3)
+	if not parts.is_empty():
+		return _join_limited(parts, " / ", 3)
 	return "压力行动已结算"
 
 func _stat_name(key: String) -> String:
@@ -225,38 +254,40 @@ func _stat_name(key: String) -> String:
 	return str(names.get(key, key))
 
 func _apply_route_modifiers(encounter_id: String) -> String:
-	if encounter_id != "family_dinner":
-		return ""
-
 	var flags: Dictionary = _game_state().get("flags")
 	var notes: Array[String] = []
-	if flags.has("read_board"):
-		_preparedness += 8
-		notes.append("你读过填报说明，准备度 +8")
-	if flags.has("teacher_prepared"):
-		_preparedness += 10
-		_pressure -= 6
-		notes.append("班主任帮你预演过解释，准备度 +10，压力 -6")
-	if flags.has("parent_script"):
-		_preparedness += 12
-		_heart += 4
-		notes.append("家长沟通版说明放在书包里，准备度 +12，心力 +4")
-
-	match str(flags.get("volunteer_done", "")):
-		"self":
-			_preparedness -= 4
-			_pressure += 8
-			_heart += 6
-			notes.append("手写志愿草稿更难解释，但你知道自己为什么要试：压力 +8，心力 +6")
-		"safe":
+	if encounter_id == "family_dinner":
+		if flags.has("read_board"):
 			_preparedness += 8
-			_pressure -= 8
-			notes.append("热门计算机路线让父母更容易进入讨论：准备度 +8，压力 -8")
-		"ai":
-			_preparedness += 14
-			_pressure -= 12
-			_heart -= 4
-			notes.append("AI 方案非常完整，也替你拿走了一部分底气：准备度 +14，压力 -12，心力 -4")
+			notes.append("你读过填报说明，准备度 +8")
+		if flags.has("teacher_prepared"):
+			_preparedness += 10
+			_pressure -= 6
+			notes.append("班主任帮你预演过解释，准备度 +10，压力 -6")
+		if flags.has("parent_script"):
+			_preparedness += 12
+			notes.append("家长沟通版说明放在书包里，准备度 +12")
+
+		match str(flags.get("volunteer_done", "")):
+			"self":
+				_preparedness -= 4
+				_pressure += 8
+				_heart += 6
+				notes.append("手写志愿草稿更难解释，但你知道自己为什么要试：压力 +8，心力 +6")
+			"safe":
+				_preparedness += 8
+				_pressure -= 8
+				notes.append("热门计算机路线让父母更容易进入讨论：准备度 +8，压力 -8")
+			"ai":
+				_preparedness += 14
+				_pressure -= 12
+				notes.append("AI 方案非常完整，让父母更容易进入讨论：准备度 +14，压力 -12")
+
+	var profile_modifier: Dictionary = _game_state().get_pressure_profile_modifier()
+	if not profile_modifier.is_empty():
+		_pressure += int(profile_modifier.get("pressure_delta", 0))
+		_preparedness += int(profile_modifier.get("preparedness_delta", 0))
+		notes.append(str(profile_modifier.get("note", "")))
 
 	_pressure = clampi(_pressure, 0, 100)
 	_heart = clampi(_heart, 0, 100)
@@ -265,6 +296,19 @@ func _apply_route_modifiers(encounter_id: String) -> String:
 	if notes.is_empty():
 		return ""
 	return "前置选择影响：" + _join_limited(notes, "；", 4)
+
+func _relationship_requirement_met(requirement: Dictionary) -> bool:
+	if requirement.is_empty():
+		return true
+	var friend_id := str(requirement.get("friend_id", ""))
+	var min_warmth := int(requirement.get("warmth", 0))
+	if friend_id.is_empty():
+		return true
+	var relationships: Dictionary = _game_state().get("relationships")
+	if not relationships.has(friend_id):
+		return false
+	var relation: Dictionary = relationships[friend_id]
+	return int(relation.get("warmth", 0)) >= min_warmth
 
 func _join_limited(values: Array[String], separator: String, max_count: int) -> String:
 	var result := ""

@@ -4,6 +4,7 @@ extends Node2D
 signal interactable_focused(marker: Area2D)
 signal interactable_unfocused
 signal interactable_activated(data: Dictionary)
+signal scene_loaded(scene_id: String, scene_data: Dictionary)
 
 const InteractableScene = preload("res://scenes/InteractableMarker.tscn")
 const PlayerControllerScript = preload("res://scripts/gameplay/player_controller.gd")
@@ -80,7 +81,9 @@ func load_scene(scene_id: String) -> void:
 		str(scene_data.get("location", "")),
 		str(scene_data.get("time", "")),
 		str(scene_data.get("objective", "")),
+		str(scene_data.get("ui_overlay", "")),
 	)
+	scene_loaded.emit(scene_id, scene_data)
 
 func activate_current() -> void:
 	if _current_marker != null:
@@ -201,6 +204,8 @@ func _draw_theme(theme: String) -> void:
 			_draw_interview()
 		"office":
 			_draw_office()
+		"school_demo":
+			_draw_school_demo()
 		"city_center", "demo_center":
 			_draw_city_center()
 		"final_overlay", "overlay":
@@ -209,32 +214,75 @@ func _draw_theme(theme: String) -> void:
 			_draw_school_hallway()
 
 func _draw_cruise() -> void:
-	_rect(Vector2.ZERO, Vector2(1600, 900), Color("101827"), _background_root)
-	_rect(Vector2(0, 0), Vector2(1600, 430), Color("1b2942"), _background_root)
-	for i in range(20):
-		var x := 70 + i * 75
-		var h := 70 + (i % 5) * 28
-		_rect(Vector2(x, 300 - h), Vector2(45, h), Color("182238"), _background_root)
+	_rect(Vector2.ZERO, Vector2(1600, 900), Color("07111d"), _background_root)
+	_rect(Vector2(0, 0), Vector2(1600, 325), Color("15243a"), _background_root)
+	_rect(Vector2(0, 165), Vector2(1600, 195), _color_alpha("233452", 0.74), _background_root)
+
+	for i in range(30):
+		var x := 620 + i * 34
+		var y := 185 + (i % 5) * 10
+		_rect(Vector2(x, y), Vector2(18, 4), _color_alpha("d88647", 0.24), _background_root)
+
+	for i in range(21):
+		var x := 500 + i * 55
+		var h := 76 + (i % 6) * 28
+		var color := Color("102037") if i % 3 != 0 else Color("162944")
+		_rect(Vector2(x, 315 - h), Vector2(34, h), color, _background_root)
 		if i % 2 == 0:
-			_rect(Vector2(x + 10, 260 - h / 2), Vector2(8, 8), Color("d89047"), _background_root)
-			_rect(Vector2(x + 25, 280 - h / 3), Vector2(8, 8), Color("8be3ff"), _background_root)
-	_rect(Vector2(0, 330), Vector2(1600, 130), Color("18283a"), _background_root)
-	for i in range(16):
-		_rect(Vector2(i * 110, 390 + (i % 2) * 18), Vector2(75, 5), _color_alpha("d89047", 0.45), _background_root)
-	_rect(Vector2(0, 430), Vector2(1600, 470), Color("3d241a"), _background_root)
-	for i in range(26):
-		_line(Vector2(0, 440 + i * 18), Vector2(1600, 455 + i * 18), Color("6a3b24"), 3)
+			_rect(Vector2(x + 8, 300 - h / 2), Vector2(7, 7), Color("e5953c"), _background_root)
+		if i % 3 == 0:
+			_rect(Vector2(x + 20, 282 - h / 3), Vector2(7, 7), Color("79e4ff"), _background_root)
+		if i == 12 or i == 16:
+			_label("星环", Vector2(x - 8, 245 - h / 3), Vector2(48, 18), 17, Color("4ed9ff"))
+
+	_rect(Vector2(0, 330), Vector2(1600, 116), Color("112337"), _background_root)
 	for i in range(18):
-		_rect(Vector2(40 + i * 88, 478), Vector2(22, 28), Color("f1c06b"), _background_root)
-	_rect(Vector2(0, 360), Vector2(1600, 20), Color("1a1110"), _background_root)
-	_rect(Vector2(80, 120), Vector2(410, 270), Color("2d211e"), _background_root)
-	_rect(Vector2(100, 220), Vector2(330, 120), Color("6b261e"), _background_root)
-	_label("欢迎登上星海号\n祝您旅途愉快", Vector2(110, 240), Vector2(300, 90), 30, Color("e5c9a0"))
-	_rect(Vector2(1020, 405), Vector2(190, 170), Color("111820"), _background_root)
-	_label("回放终端", Vector2(1042, 426), Vector2(150, 30), 26, Color("f6edd8"))
-	_rect(Vector2(1046, 470), Vector2(120, 64), Color("15364f"), _background_root)
-	_rect(Vector2(1225, 290), Vector2(310, 260), Color("0f1720"), _background_root)
-	_label("职业成就\n年薪: 128万\n股票: +312%\n项目: 28个\n评分: S+", Vector2(1260, 325), Vector2(230, 160), 25, Color("8fc7ee"))
+		_line(Vector2(0, 342 + i * 6), Vector2(1600, 350 + i * 4), _color_alpha("22415b", 0.42), 2)
+	for i in range(18):
+		_rect(Vector2(20 + i * 92, 382 + (i % 2) * 14), Vector2(64, 4), _color_alpha("e49b47", 0.48), _background_root)
+		_rect(Vector2(40 + i * 92, 404 + (i % 3) * 10), Vector2(46, 3), _color_alpha("69dcff", 0.32), _background_root)
+
+	_rect(Vector2(0, 420), Vector2(1600, 480), Color("2b1a14"), _background_root)
+	for i in range(34):
+		_line(Vector2(-40, 432 + i * 15), Vector2(1640, 448 + i * 15), Color("5a321f"), 3)
+	for i in range(17):
+		_line(Vector2(i * 110, 420), Vector2(i * 74 + 140, 900), _color_alpha("8a4a2b", 0.38), 2)
+	for i in range(22):
+		_rect(Vector2(36 + i * 72, 468), Vector2(18, 24), Color("f1c06b"), _background_root)
+		_rect(Vector2(36 + i * 72, 492), Vector2(18, 140), _color_alpha("f1c06b", 0.12), _background_root)
+
+	_rect(Vector2(0, 360), Vector2(1600, 18), Color("211613"), _background_root)
+	for i in range(18):
+		_rect(Vector2(70 + i * 86, 360), Vector2(9, 115), Color("241a17"), _background_root)
+		_line(Vector2(70 + i * 86, 410), Vector2(145 + i * 86, 410), Color("6d5845"), 4)
+		_line(Vector2(70 + i * 86, 452), Vector2(145 + i * 86, 452), Color("6d5845"), 4)
+
+	_rect(Vector2(72, 100), Vector2(445, 330), Color("211a18"), _background_root)
+	_rect(Vector2(90, 118), Vector2(408, 295), Color("4a352c"), _background_root)
+	_rect(Vector2(116, 184), Vector2(355, 204), Color("7b2e22"), _background_root)
+	_rect(Vector2(124, 198), Vector2(338, 176), _color_alpha("d68b4c", 0.16), _background_root)
+	_label("行业晚宴", Vector2(184, 207), Vector2(206, 54), 42, Color("f3b24d"))
+	_label("星环科技\n年度合作伙伴\n欢迎晚宴", Vector2(300, 282), Vector2(142, 90), 22, Color("e5c9a0"))
+	for i in range(7):
+		_rect(Vector2(112 + i * 52, 130), Vector2(18, 18), Color("f1c06b"), _background_root)
+		_rect(Vector2(116 + i * 52, 150), Vector2(10, 45), _color_alpha("f1c06b", 0.16), _background_root)
+
+	_rect(Vector2(330, 560), Vector2(225, 76), _color_alpha("f1e0c4", 0.42), _background_root)
+	_rect(Vector2(355, 545), Vector2(160, 32), Color("d8d0be"), _background_root)
+	_rect(Vector2(388, 500), Vector2(40, 60), Color("0d2619"), _background_root)
+	_rect(Vector2(395, 486), Vector2(26, 18), Color("e4b24a"), _background_root)
+	_rect(Vector2(450, 505), Vector2(16, 50), _color_alpha("f6edd8", 0.76), _background_root)
+	_rect(Vector2(478, 505), Vector2(16, 50), _color_alpha("f6edd8", 0.76), _background_root)
+	_label("香槟庆祝", Vector2(335, 502), Vector2(160, 28), 24, Color("f6edd8"))
+
+	_rect(Vector2(1018, 386), Vector2(175, 195), Color("0b1118"), _background_root)
+	_rect(Vector2(1035, 405), Vector2(140, 128), Color("12304a"), _background_root)
+	_label("回放终端", Vector2(1042, 420), Vector2(128, 30), 23, Color("f6edd8"))
+	_rect(Vector2(1055, 474), Vector2(96, 42), _color_alpha("62d8ff", 0.36), _background_root)
+	_rect(Vector2(1228, 312), Vector2(270, 238), Color("0b1118"), _background_root)
+	_rect(Vector2(1252, 338), Vector2(220, 162), Color("102840"), _background_root)
+	_label("职业成就\n资产       S\n履历       S\n影响力     S\n生活满意度 S", Vector2(1275, 358), Vector2(178, 120), 22, Color("8fc7ee"))
+	_rect(Vector2(1334, 497), Vector2(56, 36), Color("d8a13a"), _background_root)
 
 func _draw_school_hallway() -> void:
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("d7d1bf"), _background_root)
@@ -376,9 +424,20 @@ func _draw_office() -> void:
 			var color := Color("8be3ff") if (row + col) % 3 == 0 else Color("2e5d72")
 			_rect(Vector2(705 + col * 100, 122 + row * 62), Vector2(70, 36), color, _background_root)
 	_label("DATA WALL\n用户分层 / 风险预测 / 留存曲线", Vector2(760, 352), Vector2(440, 38), 25, Color("8be3ff"))
+	_rect(Vector2(1010, 112), Vector2(290, 210), Color("101820"), _background_root)
+	_label("XL-0417\n来源: 教育/表达/职业\n样本: 高三许临", Vector2(1038, 142), Vector2(225, 105), 23, Color("f6edd8"))
+	_rect(Vector2(1038, 258), Vector2(205, 22), Color("8be3ff"), _background_root)
 	_rect(Vector2(210, 515), Vector2(1180, 70), Color("303841"), _background_root)
 	for i in range(6):
 		_rect(Vector2(265 + i * 180, 540), Vector2(120, 20), Color("1d2730"), _background_root)
+
+func _draw_school_demo() -> void:
+	_draw_school_hallway()
+	_rect(Vector2(700, 90), Vector2(590, 300), Color("071927"), _background_root)
+	_label("学校合作演示\n终身协同助理\n问题改写 -> 路径建议\n低收益愿望: 折叠", Vector2(745, 130), Vector2(420, 150), 29, Color("8be3ff"))
+	_rect(Vector2(765, 315), Vector2(120, 28), Color("f1c06b"), _background_root)
+	_rect(Vector2(920, 315), Vector2(120, 28), Color("8be3ff"), _background_root)
+	_rect(Vector2(1075, 315), Vector2(120, 28), Color("d96b6b"), _background_root)
 
 func _draw_city_center() -> void:
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("d8dde1"), _background_root)
@@ -418,6 +477,8 @@ func _draw_final_overlay() -> void:
 	_label("星环数据墙", Vector2(1270, 160), Vector2(190, 44), 29, Color("8be3ff"))
 	_rect(Vector2(570, 510), Vector2(470, 120), _color_alpha("e7e2d6", 0.72), _background_root)
 	_label("城市服务演示中心\n所有地图重叠在这里", Vector2(640, 535), Vector2(330, 58), 26, Color("26323b"))
+	_rect(Vector2(1040, 510), Vector2(360, 120), _color_alpha("071927", 0.84), _background_root)
+	_label("是否上传人生模型?\n上传 / 上传", Vector2(1090, 535), Vector2(240, 58), 28, Color("8be3ff"))
 
 func _rect(pos: Vector2, size: Vector2, color: Color, parent: Node) -> ColorRect:
 	var rect := ColorRect.new()

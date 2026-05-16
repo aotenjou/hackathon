@@ -21,6 +21,9 @@ func _initialize() -> void:
 		if scene_data.is_empty():
 			failures.append("missing scene: %s" % scene_id)
 			continue
+		var narration_id := str(scene_data.get("narration", ""))
+		if narration_id.is_empty() or _chapter_data().get_dialogue(narration_id).is_empty():
+			failures.append("missing narration %s in %s" % [narration_id, scene_id])
 		for interactable in scene_data.get("interactables", []):
 			if interactable.has("dialogue") and _chapter_data().get_dialogue(str(interactable["dialogue"])).is_empty():
 				failures.append("missing dialogue %s in %s" % [str(interactable["dialogue"]), scene_id])

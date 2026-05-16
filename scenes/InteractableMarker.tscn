@@ -18,14 +18,14 @@ color = Color(0.93, 0.69, 0.22, 1)
 polygon = PackedVector2Array(0, -50, 30, -22, 20, 18, 0, 42, -20, 18, -30, -22)
 
 [node name="Label" type="Label" parent="."]
-offset_left = -78.0
-offset_top = -92.0
-offset_right = 78.0
-offset_bottom = -52.0
+offset_left = -86.0
+offset_top = -112.0
+offset_right = 86.0
+offset_bottom = -48.0
 theme_override_colors/font_color = Color(0.964706, 0.929412, 0.847059, 1)
 theme_override_colors/font_shadow_color = Color(0.0431373, 0.0509804, 0.0627451, 1)
 theme_override_constants/shadow_offset_x = 2
 theme_override_constants/shadow_offset_y = 2
-theme_override_font_sizes/font_size = 26
+theme_override_font_sizes/font_size = 21
 horizontal_alignment = 1
 vertical_alignment = 1
