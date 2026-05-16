@@ -29,6 +29,7 @@
     {
       "id": "hero_phone",
       "component": "standard_character",
+      "life_stage": "adult",
       "position": [695, 705],
       "anchor": "bottom_center",
       "z_index": 20,

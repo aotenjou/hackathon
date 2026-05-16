@@ -8,6 +8,18 @@ signal interactable_activated(data: Dictionary)
 const InteractableScene = preload("res://scenes/InteractableMarker.tscn")
 const PlayerControllerScript = preload("res://scripts/gameplay/player_controller.gd")
 
+const PLAYER_STAGE_BY_CHAPTER := {
+	"chapter_0": "adult",
+	"chapter_1": "school",
+	"chapter_2": "school",
+	"chapter_3": "college",
+	"chapter_4": "college",
+	"chapter_5": "adult",
+	"chapter_6": "adult",
+	"chapter_7": "adult",
+	"chapter_8": "adult",
+}
+
 var current_scene_id := ""
 var scene_data := {}
 var player: CharacterBody2D
@@ -60,6 +72,7 @@ func load_scene(scene_id: String) -> void:
 
 	player.global_position = scene_data.get("player_position", Vector2(760, 600))
 	player.movement_bounds = scene_data.get("bounds", Rect2(70, 420, 1460, 280))
+	player.set_age_stage(_player_stage_for_chapter(str(scene_data.get("chapter", "chapter_0"))))
 
 	_game_state().set_context(
 		str(scene_data.get("chapter", "chapter_0")),
@@ -451,3 +464,6 @@ func _game_state() -> Node:
 
 func _chapter_data() -> Node:
 	return get_node("/root/ChapterData")
+
+func _player_stage_for_chapter(chapter_id: String) -> String:
+	return str(PLAYER_STAGE_BY_CHAPTER.get(chapter_id, "adult"))
