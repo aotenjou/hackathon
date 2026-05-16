@@ -22,3 +22,9 @@ ai.local.json
 *.svd
 *.pdb
 *.mdb
+
+# macos
+
+.DS_Store
+.AppleDouble
+.LSOverride
