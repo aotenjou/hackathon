@@ -27,19 +27,26 @@ func _initialize() -> void:
 	await _check_self_friction_and_pressure_modifier()
 	await _check_final_ending_resolution()
 	await _check_auto_final_ending_dialogue()
+	await _check_stats_panel_toggle()
 	await _check_success_guidance_targets()
+	await _check_stat_simplification_and_legacy_migration()
 	await _check_success_guidance_hud_modes()
 	await _check_scene_entry_guidance()
+	await _check_cruise_player_layering()
 	await _check_ai_cost_button_labels()
 	await _check_alienation_visual_state()
 	await _check_alienation_visual_filter()
 	await _check_ai_dialogue_heart_cost()
 	await _check_non_ai_dialogue_does_not_reduce_heart()
+	await _check_dialogue_choice_triggers_once()
+	await _check_auto_final_ending_triggers_once()
 	await _check_ai_pressure_heart_cost()
 	await _check_non_ai_pressure_does_not_reduce_heart()
+	await _check_pressure_action_triggers_once()
 	await _check_pressure_gate()
 	await _check_pressure_success()
 	await _check_pressure_failure()
+	await _check_pressure_actions_exhaust_to_failure()
 	await _check_new_pressure_success_failure_branches()
 	await _check_main_scene_activation()
 
@@ -503,12 +510,12 @@ func _check_success_guidance_targets() -> void:
 	_reset_state()
 	var game_state := _game_state()
 	var targets: Dictionary = game_state.get_success_targets()
-	_expect_equal(int(targets.get("ability_exp", 0)), 82, "success target ability mismatch")
+	_expect_equal(targets.size(), 3, "success targets should expose only core public metrics")
+	if targets.has("ability_exp") or targets.has("wealth_score") or targets.has("success_progress"):
+		_failures.append("success targets should not expose deprecated metrics")
 	_expect_equal(int(targets.get("resume_score", 0)), 92, "success target resume mismatch")
 	_expect_equal(int(targets.get("network_score", 0)), 71, "success target network mismatch")
-	_expect_equal(int(targets.get("wealth_score", 0)), 88, "success target wealth mismatch")
 	_expect_equal(int(targets.get("stability_score", 0)), 96, "success target stability mismatch")
-	_expect_equal(int(targets.get("success_progress", 0)), 100, "success target progress mismatch")
 
 	game_state.stats["resume_score"] = 80
 	game_state.stats["network_score"] = 50
@@ -524,6 +531,44 @@ func _check_success_guidance_targets() -> void:
 		_expect_equal(str(gaps[1].get("severity", "")), "normal", "medium success gap should be normal")
 		_expect_equal(str(gaps[2].get("severity", "")), "minor", "small success gap should be minor")
 	_expect_equal(game_state.stats, before_stats, "success guidance query should not mutate stats")
+
+func _check_stat_simplification_and_legacy_migration() -> void:
+	_reset_state()
+	var game_state := _game_state()
+	for deprecated_id in ["sleep", "ability_exp", "wealth_score", "language_assimilation", "success_progress"]:
+		if game_state.stats.has(deprecated_id):
+			_failures.append("default stats should not include deprecated stat %s" % deprecated_id)
+
+	game_state.stats["resume_score"] = 80
+	game_state.adjust_stat("ability_exp", 5)
+	_expect_equal(int(game_state.stats.get("resume_score", 0)), 85, "legacy ability should map to career capital")
+	game_state.adjust_stat("success_progress", -50)
+	if game_state.stats.has("success_progress"):
+		_failures.append("derived success_progress write should not create stored stat")
+	_expect_equal(game_state.get_stat_value("success_progress"), game_state.get_success_progress(), "legacy success value should be derived")
+
+	var legacy_save: Dictionary = game_state.get_save_data()
+	legacy_save["stats"] = {
+		"heart": 30,
+		"family": 35,
+		"clarity": 40,
+		"ai_dependence": 20,
+		"resume_score": 80,
+		"network_score": 60,
+		"stability_score": 70,
+		"ability_exp": 90,
+		"wealth_score": 96,
+		"sleep": 10,
+		"language_assimilation": 88,
+		"success_progress": 33,
+	}
+	game_state.load_save_data(legacy_save)
+	await process_frame
+	_expect_equal(int(game_state.stats.get("resume_score", 0)), 82, "legacy ability migration mismatch")
+	_expect_equal(int(game_state.stats.get("stability_score", 0)), 72, "legacy wealth migration mismatch")
+	for deprecated_id in ["sleep", "ability_exp", "wealth_score", "language_assimilation", "success_progress"]:
+		if game_state.stats.has(deprecated_id):
+			_failures.append("loaded stats should strip deprecated stat %s" % deprecated_id)
 
 func _check_success_guidance_hud_modes() -> void:
 	_reset_state()
@@ -563,6 +608,41 @@ func _check_success_guidance_hud_modes() -> void:
 	hud.queue_free()
 	await process_frame
 
+func _check_stats_panel_toggle() -> void:
+	_reset_state()
+	var hud := HUDPacked.instantiate()
+	root.add_child(hud)
+	await process_frame
+
+	var panel: PanelContainer = hud.get("_stats_panel")
+	var toggle: Button = hud.get("_stats_toggle_button")
+	if panel == null:
+		_failures.append("HUD stats panel missing")
+	elif panel.visible:
+		_failures.append("HUD stats panel should start collapsed")
+	if toggle == null:
+		_failures.append("HUD stats toggle missing")
+	else:
+		if not str(toggle.text).contains("指标"):
+			_failures.append("HUD stats toggle should advertise metric panel when collapsed")
+		toggle.pressed.emit()
+		await process_frame
+		if panel != null and not panel.visible:
+			_failures.append("HUD stats panel did not open from toggle")
+		if not str(toggle.text).contains("收起"):
+			_failures.append("HUD stats toggle should switch to collapse text when open")
+		hud.refresh()
+		await process_frame
+		if panel != null and not panel.visible:
+			_failures.append("HUD stats panel should stay open after refresh")
+		toggle.pressed.emit()
+		await process_frame
+		if panel != null and panel.visible:
+			_failures.append("HUD stats panel did not collapse from toggle")
+
+	hud.queue_free()
+	await process_frame
+
 func _check_scene_entry_guidance() -> void:
 	_reset_state()
 	var main := MainScene.instantiate()
@@ -596,6 +676,26 @@ func _check_scene_entry_guidance() -> void:
 	await process_frame
 	if not str(focus_label.text).contains("简历优化"):
 		_failures.append("resume pipeline entry hint did not update after scene load")
+
+	main.queue_free()
+	await process_frame
+
+func _check_cruise_player_layering() -> void:
+	_reset_state()
+	var main := MainScene.instantiate()
+	root.add_child(main)
+	await process_frame
+	await process_frame
+
+	var world: Node = main.get("world")
+	if world == null:
+		_failures.append("main world missing for cruise layering check")
+	else:
+		var player: Node2D = world.get("player")
+		if player == null:
+			_failures.append("world player missing for cruise layering check")
+		elif player.z_index <= 6:
+			_failures.append("cruise player should render above success panel prop")
 
 	main.queue_free()
 	await process_frame
@@ -648,7 +748,15 @@ func _check_alienation_visual_state() -> void:
 
 	game_state.current_chapter_id = "chapter_5"
 	state = game_state.get_alienation_visual_state()
-	_expect_equal(str(state.get("mode", "")), "flicker", "chapter 5 should start alienation flicker")
+	_expect_equal(str(state.get("mode", "")), "gradient", "chapter 5 should start gradual alienation")
+	if float(state.get("intensity", 0.0)) <= 0.0 or float(state.get("intensity", 0.0)) >= 1.0:
+		_failures.append("chapter 5 alienation should be partial grayscale")
+
+	var chapter_intensity := float(state.get("intensity", 0.0))
+	game_state.stats["ai_dependence"] = 55
+	state = game_state.get_alienation_visual_state()
+	if float(state.get("intensity", 0.0)) <= chapter_intensity:
+		_failures.append("AI dependence should increase alienation intensity")
 
 	game_state.current_chapter_id = "chapter_6"
 	game_state.stats["heart"] = 25
@@ -673,21 +781,34 @@ func _check_alienation_visual_filter() -> void:
 	var game_state := _game_state()
 	game_state.current_chapter_id = "chapter_5"
 	filter.refresh_from_state(true)
-	_expect_equal(filter.get_visual_mode(), "flicker", "alienation filter did not enter flicker mode")
-	filter.trigger_checkpoint_flash()
-	_expect_float_near(filter.get_filter_amount(), 1.0, "checkpoint should trigger immediate grayscale flash")
-	await create_timer(0.7).timeout
-	_expect_float_near(filter.get_filter_amount(), 0.0, "flicker mode should settle back to color between flashes")
-	game_state.adjust_stat("ai_dependence", 1)
+	_expect_equal(filter.get_visual_mode(), "gradient", "alienation filter did not enter gradient mode")
+	var chapter_target := float(filter.get_target_filter_amount())
+	if chapter_target <= 0.0 or chapter_target >= 1.0:
+		_failures.append("gradient target should start as partial grayscale")
+	_expect_float_near(filter.get_filter_amount(), chapter_target, "instant gradient refresh should reach target")
+
+	filter.refresh_checkpoint_state()
+	_expect_float_near(filter.get_filter_amount(), chapter_target, "checkpoint should not jump to full grayscale")
+
+	game_state.adjust_stat("ai_dependence", 20)
 	await process_frame
-	_expect_float_near(filter.get_filter_amount(), 1.0, "AI dependence increase should trigger immediate alienation flash")
+	var ai_target := float(filter.get_target_filter_amount())
+	if ai_target <= chapter_target:
+		_failures.append("AI dependence increase should raise grayscale target")
+	if filter.get_filter_amount() >= ai_target:
+		_failures.append("AI dependence increase should fade gradually instead of jumping to target")
+	await create_timer(1.5).timeout
+	_expect_float_near(filter.get_filter_amount(), ai_target, "AI dependence increase should settle at raised grayscale target")
 
 	game_state.stats["heart"] = 25
 	game_state.stats["ai_dependence"] = 70
-	filter.refresh_from_state(true)
+	filter.refresh_from_state()
 	_expect_equal(filter.get_visual_mode(), "persistent", "alienation filter did not enter persistent mode")
-	_expect_float_near(filter.get_filter_amount(), 1.0, "persistent alienation should be fully grayscale")
-	filter.trigger_checkpoint_flash()
+	if filter.get_filter_amount() >= 1.0:
+		_failures.append("persistent alienation should fade to full grayscale instead of jumping")
+	await create_timer(2.1).timeout
+	_expect_float_near(filter.get_filter_amount(), 1.0, "persistent alienation should settle at full grayscale")
+	filter.refresh_checkpoint_state()
 	_expect_equal(filter.get_visual_mode(), "persistent", "checkpoint should not override persistent mode")
 	_expect_float_near(filter.get_filter_amount(), 1.0, "persistent mode should stay fully grayscale")
 
@@ -738,6 +859,74 @@ func _check_non_ai_dialogue_does_not_reduce_heart() -> void:
 	dialogue.queue_free()
 	await process_frame
 
+func _check_dialogue_choice_triggers_once() -> void:
+	_reset_state()
+	var dialogue := DialoguePacked.instantiate()
+	root.add_child(dialogue)
+	await process_frame
+
+	var node: Dictionary = _chapter_data().get_dialogue("d_linzhou_hallway")
+	var choice: Dictionary = _find_by_id(node.get("choices", []), "linzhou_self")
+	dialogue.show_dialogue("d_linzhou_hallway")
+	dialogue._select_choice(choice)
+	await process_frame
+
+	var game_state := _game_state()
+	var save_data: Dictionary = game_state.get_save_data()
+	var clarity_after := int(game_state.stats.get("clarity", 0))
+	var warmth_after := int(game_state.relationships["linzhou"].get("warmth", 0))
+	var choices_after: int = game_state.choice_history.size()
+	var feedback_after: int = game_state.feedback_log.size()
+
+	dialogue._select_choice(choice)
+	await process_frame
+	_expect_equal(int(game_state.stats.get("clarity", 0)), clarity_after, "dialogue choice should not apply stats twice")
+	_expect_equal(int(game_state.relationships["linzhou"].get("warmth", 0)), warmth_after, "dialogue choice should not apply relationship twice")
+	_expect_equal(game_state.choice_history.size(), choices_after, "dialogue choice history should not duplicate")
+	_expect_equal(game_state.feedback_log.size(), feedback_after, "dialogue feedback should not duplicate")
+
+	dialogue.show_dialogue("d_linzhou_hallway")
+	await process_frame
+	if _button_text_found(dialogue, "说自己也没想清楚"):
+		_failures.append("used dialogue choice should be hidden")
+
+	game_state.reset_for_new_game()
+	game_state.load_save_data(save_data)
+	await process_frame
+	dialogue.show_dialogue("d_linzhou_hallway")
+	await process_frame
+	if _button_text_found(dialogue, "说自己也没想清楚"):
+		_failures.append("used dialogue choice should stay hidden after save load")
+
+	dialogue.queue_free()
+	await process_frame
+
+func _check_auto_final_ending_triggers_once() -> void:
+	_reset_state()
+	var dialogue := DialoguePacked.instantiate()
+	root.add_child(dialogue)
+	await process_frame
+
+	var node: Dictionary = _chapter_data().get_dialogue("d_final_three_endings")
+	var choice: Dictionary = _find_by_id(node.get("choices", []), "ending_auto_resolve")
+	dialogue.show_dialogue("d_final_three_endings")
+	dialogue._select_choice(choice)
+	await process_frame
+
+	var game_state := _game_state()
+	var settlement_count: int = game_state.settlement_history.size()
+	var choices_after: int = game_state.choice_history.size()
+	var final_ending := str(game_state.flags.get("final_ending", ""))
+	dialogue._select_choice(choice)
+	await process_frame
+
+	_expect_equal(game_state.settlement_history.size(), settlement_count, "auto final ending settlement should not duplicate")
+	_expect_equal(game_state.choice_history.size(), choices_after, "auto final ending choice should not duplicate")
+	_expect_equal(str(game_state.flags.get("final_ending", "")), final_ending, "auto final ending flag should remain stable")
+
+	dialogue.queue_free()
+	await process_frame
+
 func _check_ai_pressure_heart_cost() -> void:
 	_reset_state()
 	var pressure := PressurePacked.instantiate()
@@ -777,6 +966,45 @@ func _check_non_ai_pressure_does_not_reduce_heart() -> void:
 	pressure.queue_free()
 	await process_frame
 
+func _check_pressure_action_triggers_once() -> void:
+	_reset_state()
+	var pressure := PressurePacked.instantiate()
+	root.add_child(pressure)
+	await process_frame
+
+	var encounter: Dictionary = _chapter_data().get_pressure("family_dinner")
+	var action: Dictionary = _find_by_id(encounter.get("actions", []), "dinner_ai")
+	_game_state().ai_stage = 0
+	pressure.start("family_dinner")
+	var pressure_after_start := int(pressure.get("_pressure"))
+	pressure._select_action(action)
+	await process_frame
+
+	var game_state := _game_state()
+	var global_heart_after := int(game_state.stats.get("heart", 0))
+	var local_heart_after := int(pressure.get("_heart"))
+	var pressure_after := int(pressure.get("_pressure"))
+	var choices_after: int = game_state.choice_history.size()
+	var feedback_after: int = game_state.feedback_log.size()
+	pressure._select_action(action)
+	await process_frame
+
+	_expect_equal(int(game_state.stats.get("heart", 0)), global_heart_after, "pressure action should not reduce global heart twice")
+	_expect_equal(int(pressure.get("_heart")), local_heart_after, "pressure action should not reduce local heart twice")
+	_expect_equal(int(pressure.get("_pressure")), pressure_after, "pressure action should not change pressure twice")
+	_expect_equal(game_state.choice_history.size(), choices_after, "pressure action choice history should not duplicate")
+	_expect_equal(game_state.feedback_log.size(), feedback_after, "pressure action feedback should not duplicate")
+	if pressure_after >= pressure_after_start:
+		_failures.append("pressure action did not apply first pressure delta")
+
+	pressure.start("family_dinner")
+	await process_frame
+	if _button_text_found(pressure, "智能优化"):
+		_failures.append("used pressure action should be hidden")
+
+	pressure.queue_free()
+	await process_frame
+
 func _check_pressure_gate() -> void:
 	_reset_state()
 	var pressure := PressurePacked.instantiate()
@@ -805,14 +1033,19 @@ func _check_pressure_success() -> void:
 	await process_frame
 
 	var encounter: Dictionary = _chapter_data().get_pressure("family_dinner")
-	var action: Dictionary = _find_by_id(encounter.get("actions", []), "dinner_ai")
+	var action_ids := ["dinner_ai", "dinner_package", "dinner_direct", "dinner_evidence"]
 	pressure.start("family_dinner")
-	for _index in range(3):
+	for action_id in action_ids:
+		var action: Dictionary = _find_by_id(encounter.get("actions", []), action_id)
 		pressure._select_action(action)
 		await process_frame
+		if bool(pressure.get("_done")):
+			break
 
 	_expect_equal(_game_state().flags.get("family_dinner_done"), "success", "pressure success flag not persisted")
-	_expect_equal(int(_game_state().stats.get("success_progress", 0)), 100, "pressure success effects not applied")
+	_expect_equal(int(_game_state().stats.get("family", 0)), 60, "pressure success effects not applied")
+	if _game_state().stats.has("success_progress"):
+		_failures.append("pressure success should not create deprecated success_progress stat")
 
 	pressure.queue_free()
 	await process_frame
@@ -824,14 +1057,14 @@ func _check_pressure_failure() -> void:
 	await process_frame
 
 	var encounter: Dictionary = _chapter_data().get_pressure("family_dinner")
-	var action: Dictionary = _find_by_id(encounter.get("actions", []), "dinner_direct")
+	var action: Dictionary = _find_by_id(encounter.get("actions", []), "dinner_delay")
 	pressure.start("family_dinner")
-	for _index in range(4):
-		pressure._select_action(action)
-		await process_frame
+	pressure.set("_rounds", 1)
+	pressure._select_action(action)
+	await process_frame
 
 	_expect_equal(_game_state().flags.get("family_dinner_done"), "failure", "pressure failure flag not persisted")
-	_expect_equal(int(_game_state().stats.get("family", 0)), 27, "pressure failure effects not applied")
+	_expect_equal(int(_game_state().stats.get("family", 0)), 35, "pressure failure effects not applied")
 
 	pressure.queue_free()
 	await process_frame
@@ -844,6 +1077,28 @@ func _check_new_pressure_success_failure_branches() -> void:
 
 	await _check_pressure_branch_can_finish(encounter_id, true)
 	await _check_pressure_branch_can_finish(encounter_id, false)
+
+func _check_pressure_actions_exhaust_to_failure() -> void:
+	_reset_state()
+	var pressure := PressurePacked.instantiate()
+	root.add_child(pressure)
+	await process_frame
+
+	var encounter: Dictionary = _chapter_data().get_pressure("family_dinner")
+	pressure.start("family_dinner")
+	pressure.set("_pressure", 100)
+	pressure.set("_heart", 100)
+	pressure.set("_rounds", 10)
+	for action in encounter.get("actions", []):
+		pressure._select_action(action)
+		await process_frame
+		if bool(pressure.get("_done")):
+			break
+
+	_expect_equal(_game_state().flags.get("family_dinner_done"), "failure", "exhausted pressure actions should fail encounter")
+
+	pressure.queue_free()
+	await process_frame
 
 func _find_new_pressure_encounter_with_branches() -> String:
 	var chapter_data := _chapter_data()
@@ -982,6 +1237,12 @@ func _find_buttons(node: Node) -> Array[Button]:
 	for child in node.get_children():
 		buttons.append_array(_find_buttons(child))
 	return buttons
+
+func _button_text_found(node: Node, expected_text: String) -> bool:
+	for button in _find_buttons(node):
+		if str(button.text).contains(expected_text):
+			return true
+	return false
 
 func _reset_state() -> void:
 	_game_state().reset_for_new_game()

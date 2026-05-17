@@ -14,8 +14,8 @@ script = ExtResource("1_marker")
 shape = SubResource("CircleShape2D_marker")
 
 [node name="Icon" type="Polygon2D" parent="."]
-color = Color(0.93, 0.69, 0.22, 1)
-polygon = PackedVector2Array(0, -50, 30, -22, 20, 18, 0, 42, -20, 18, -30, -22)
+color = Color(0.96, 0.96, 0.92, 0.95)
+polygon = PackedVector2Array(0, -8, 3.061, -7.391, 5.657, -5.657, 7.391, -3.061, 8, 0, 7.391, 3.061, 5.657, 5.657, 3.061, 7.391, 0, 8, -3.061, 7.391, -5.657, 5.657, -7.391, 3.061, -8, 0, -7.391, -3.061, -5.657, -5.657, -3.061, -7.391)
 
 [node name="Label" type="Label" parent="."]
 offset_left = -86.0

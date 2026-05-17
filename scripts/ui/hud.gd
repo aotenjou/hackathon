@@ -21,10 +21,12 @@ var _ai_close_button: Button
 var _bag_panel: PanelContainer
 var _bag_body: Label
 var _stats_panel: PanelContainer
+var _stats_toggle_button: Button
 var _joystick: Control
 var _last_guidance_signature := ""
 var _default_focus_hint := ""
 var _focus_text_active := false
+var _stats_panel_expanded := false
 
 const VirtualJoystickScript = preload("res://scripts/ui/virtual_joystick.gd")
 var COL_PANEL := Color("0d151f")
@@ -125,15 +127,16 @@ func refresh() -> void:
 	_location_label.text = _game_state().current_location
 	_objective_label.text = "目标：" + _game_state().current_objective
 	_time_label.text = _game_state().current_time
-	_bottom_label.text = "心力 %02d  /  成功值 %s  /  依赖 %02d" % [
+	var success_value := _derived_success_value()
+	_bottom_label.text = "心力 %02d  /  成功评级 %s  /  依赖 %02d" % [
 		int(_game_state().stats.get("heart", 0)),
-		_grade(int(_game_state().stats.get("success_progress", 0))),
+		_grade(success_value),
 		int(_game_state().stats.get("ai_dependence", 0)),
 	]
 	if _game_state().ui_phase in ["profile_system", "tag_overlay", "final_summary"]:
 		_bottom_label.text = "心力 %02d  /  适配评级 %s  /  依赖 %02d" % [
 			int(_game_state().stats.get("heart", 0)),
-			_grade(int(_game_state().stats.get("success_progress", 0))),
+			_grade(success_value),
 			int(_game_state().stats.get("ai_dependence", 0)),
 		]
 	_rebuild_stats_panel()
@@ -214,8 +217,14 @@ func _build_ui() -> void:
 	_stats_panel = PanelContainer.new()
 	_stats_panel.position = Vector2(1230, 318)
 	_stats_panel.size = Vector2(300, 318)
+	_stats_panel.visible = false
 	_stats_panel.add_theme_stylebox_override("panel", _panel_style(_color_alpha("08111a", 0.82), _color_alpha("3d5972", 0.92), 3, 4))
 	root.add_child(_stats_panel)
+
+	_stats_toggle_button = _stats_toggle_control()
+	_stats_toggle_button.pressed.connect(_toggle_stats_panel)
+	root.add_child(_stats_toggle_button)
+	_update_stats_toggle_button()
 
 	_ai_panel = PanelContainer.new()
 	_ai_panel.position = Vector2(1060, 150)
@@ -323,6 +332,21 @@ func _rebuild_stats_panel() -> void:
 	route.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	route.size = Vector2(285, 52)
 	box.add_child(route)
+	_update_stats_toggle_button()
+
+func _toggle_stats_panel() -> void:
+	_stats_panel_expanded = not _stats_panel_expanded
+	_stats_panel.visible = _stats_panel_expanded
+	_update_stats_toggle_button()
+
+func _update_stats_toggle_button() -> void:
+	if _stats_toggle_button == null:
+		return
+	if _stats_panel != null:
+		_stats_panel.visible = _stats_panel_expanded
+	_stats_toggle_button.text = "◇\n收起" if _stats_panel_expanded else "◇\n指标"
+	_stats_toggle_button.tooltip_text = "隐藏右侧指标面板" if _stats_panel_expanded else "显示右侧指标面板"
+	_stats_toggle_button.position = Vector2(1138, 318) if _stats_panel_expanded else Vector2(1492, 318)
 
 func _stats_title() -> String:
 	match _game_state().ui_phase:
@@ -339,39 +363,35 @@ func _stats_lines() -> Array:
 	match _game_state().ui_phase:
 		"profile_system":
 			return [
-				["能力样本", "ability_exp"],
-				["履历转化", "resume_score"],
-				["协同网络", "network_score"],
-				["财富预期", "wealth_score"],
-				["路径稳定", "stability_score"],
-				["自我噪声", "clarity"],
+				["职业画像", "resume_score"],
+				["人脉样本", "network_score"],
+				["稳定画像", "stability_score"],
+				["自我清晰", "clarity"],
+				["AI依赖", "ai_dependence"],
 			]
 		"tag_overlay":
 			return [
-				["适配对象", "ability_exp"],
-				["转化概率", "resume_score"],
-				["传播价值", "network_score"],
-				["消费潜力", "wealth_score"],
-				["履约稳定", "stability_score"],
-				["偏离信号", "clarity"],
+				["职业标签", "resume_score"],
+				["人脉标签", "network_score"],
+				["稳定标签", "stability_score"],
+				["自我信号", "clarity"],
+				["AI依赖", "ai_dependence"],
 			]
 		"final_summary":
 			return [
-				["完整度", "success_progress"],
-				["表达成熟", "language_assimilation"],
-				["系统依赖", "ai_dependence"],
-				["社会评价", "resume_score"],
-				["稳定叙事", "stability_score"],
-				["剩余自我", "clarity"],
+				["职业资本", "resume_score"],
+				["人脉资源", "network_score"],
+				["稳定适配", "stability_score"],
+				["自我清晰", "clarity"],
+				["AI依赖", "ai_dependence"],
 			]
 		_:
 			return [
-				["能力", "ability_exp"],
-				["履历", "resume_score"],
-				["人脉", "network_score"],
-				["财富", "wealth_score"],
-				["稳定", "stability_score"],
-				["清晰", "clarity"],
+				["职业资本", "resume_score"],
+				["人脉资源", "network_score"],
+				["稳定适配", "stability_score"],
+				["自我清晰", "clarity"],
+				["AI依赖", "ai_dependence"],
 			]
 
 func _route_profile_text() -> String:
@@ -422,6 +442,22 @@ func _action_button(icon: String, label: String, pos: Vector2, color: Color, acc
 	button.add_theme_stylebox_override("normal", _round_button_style(color, accent, 4))
 	button.add_theme_stylebox_override("hover", _round_button_style(Color("1f3042"), accent.lightened(0.2), 4))
 	button.add_theme_stylebox_override("pressed", _round_button_style(COL_PANEL_DARK, COL_AI, 5))
+	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	return button
+
+func _stats_toggle_control() -> Button:
+	var button := Button.new()
+	button.size = Vector2(74, 72)
+	button.add_theme_font_size_override("font_size", 19)
+	button.add_theme_color_override("font_color", COL_TEXT)
+	button.add_theme_color_override("font_hover_color", Color.WHITE)
+	button.add_theme_color_override("font_pressed_color", COL_AI)
+	button.add_theme_color_override("font_shadow_color", Color("05070a"))
+	button.add_theme_constant_override("shadow_offset_x", 2)
+	button.add_theme_constant_override("shadow_offset_y", 2)
+	button.add_theme_stylebox_override("normal", _panel_style(_color_alpha("08111a", 0.86), _color_alpha("3d5972", 0.92), 3, 4))
+	button.add_theme_stylebox_override("hover", _panel_style(Color("122436"), COL_AI, 3, 4))
+	button.add_theme_stylebox_override("pressed", _panel_style(COL_PANEL_DARK, COL_AI, 4, 4))
 	button.alignment = HORIZONTAL_ALIGNMENT_CENTER
 	return button
 
@@ -494,6 +530,19 @@ func _grade(value: int) -> String:
 	if value >= 50:
 		return "C"
 	return "D"
+
+func _derived_success_value() -> int:
+	var state := _game_state()
+	var stats: Dictionary = state.get("stats")
+	for method_name in ["get_success_progress", "get_success_value", "get_derived_success_value", "get_success_rating_value"]:
+		if state.has_method(method_name):
+			return clampi(int(state.call(method_name)), 0, 100)
+
+	var keys := ["resume_score", "network_score", "stability_score"]
+	var total := 0
+	for key in keys:
+		total += int(stats.get(key, 0))
+	return int(round(float(total) / float(keys.size())))
 
 func _fallback_focus_text() -> String:
 	if _default_focus_hint.is_empty():

@@ -12,8 +12,11 @@ const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture
 const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
 const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/school_hallway.png"
 const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.png"
+const GRADUATION_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch02_graduation/backgrounds/graduation_field.png"
 const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.png"
 const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.png"
+const PLAYER_LAYER := 20
+const INTERACTABLE_LAYER := 50
 
 const PLAYER_STAGE_BY_CHAPTER := {
 	"chapter_0": "adult",
@@ -48,14 +51,17 @@ func _ready() -> void:
 
 	_interactable_root = Node2D.new()
 	_interactable_root.name = "Interactables"
+	_interactable_root.z_index = INTERACTABLE_LAYER
 	add_child(_interactable_root)
 
 	_label_root = Node2D.new()
 	_label_root.name = "FloatingLabels"
+	_label_root.z_index = INTERACTABLE_LAYER
 	add_child(_label_root)
 
 	player = PlayerControllerScript.new()
 	player.name = "Player"
+	player.z_index = PLAYER_LAYER
 	add_child(player)
 
 	load_scene("cruise_deck")
@@ -359,6 +365,9 @@ func _draw_home_placeholder() -> void:
 	_label("升学报告\n家庭安心\n路径预测", Vector2(1205, 155), Vector2(130, 120), 24, Color("8be3ff"))
 
 func _draw_graduation() -> void:
+	if _draw_fullscreen_background(GRADUATION_FIELD_BACKGROUND_PATH):
+		return
+
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("8eb0cf"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 420), Color("b7d4ec"), _background_root)
 	_rect(Vector2(0, 420), Vector2(1600, 310), Color("6b7d55"), _background_root)

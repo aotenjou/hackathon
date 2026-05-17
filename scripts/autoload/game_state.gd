@@ -15,12 +15,12 @@ const STRATEGY_SAFE := "safe"
 const STRATEGY_AI := "ai"
 const STAT_HEART := "heart"
 const ALIENATION_MODE_NORMAL := "normal"
-const ALIENATION_MODE_FLICKER := "flicker"
+const ALIENATION_MODE_GRADIENT := "gradient"
 const ALIENATION_MODE_PERSISTENT := "persistent"
 const ALIENATION_PERSISTENT_HEART_MAX := 25
 const ALIENATION_PERSISTENT_AI_MIN := 70
-const ALIENATION_FLICKER_START_CHAPTER := 5
-const ALIENATION_FLICKER_END_CHAPTER := 8
+const ALIENATION_GRADIENT_START_CHAPTER := 5
+const ALIENATION_GRADIENT_END_CHAPTER := 8
 const ROUTE_KEYS := [STRATEGY_SELF, STRATEGY_SAFE, STRATEGY_AI]
 const ROUTE_LABELS := {
 	"self": "自我选择",
@@ -28,21 +28,35 @@ const ROUTE_LABELS := {
 	"ai": "AI提醒",
 }
 const SUCCESS_TARGETS := {
-	"ability_exp": 82,
 	"resume_score": 92,
 	"network_score": 71,
-	"wealth_score": 88,
 	"stability_score": 96,
-	"success_progress": 100,
 }
 const SUCCESS_LABELS := {
-	"ability_exp": "能力",
-	"resume_score": "履历",
-	"network_score": "人脉",
-	"wealth_score": "财富",
-	"stability_score": "稳定",
-	"success_progress": "成功路径",
+	"resume_score": "职业资本",
+	"network_score": "人脉资源",
+	"stability_score": "稳定适配",
 }
+const WRITABLE_STAT_DEFAULTS := {
+	"heart": 42,
+	"family": 40,
+	"clarity": 58,
+	"ai_dependence": 12,
+	"resume_score": 92,
+	"network_score": 71,
+	"stability_score": 96,
+}
+const LEGACY_STAT_MAPPINGS := {
+	"ability_exp": "resume_score",
+	"wealth_score": "stability_score",
+}
+const DERIVED_ONLY_STATS := {
+	"sleep": true,
+	"language_assimilation": true,
+	"success_progress": true,
+}
+const LEGACY_ABILITY_BASELINE := 82
+const LEGACY_WEALTH_BASELINE := 88
 
 var current_chapter_id := "chapter_0"
 var current_scene_id := "cruise_deck"
@@ -54,17 +68,12 @@ var ui_phase := "success_path"
 
 var stats := {
 	"heart": 42,
-	"sleep": 72,
 	"family": 40,
 	"clarity": 58,
 	"ai_dependence": 12,
-	"language_assimilation": 4,
-	"ability_exp": 82,
 	"resume_score": 92,
 	"network_score": 71,
-	"wealth_score": 88,
 	"stability_score": 96,
-	"success_progress": 100,
 }
 
 var skills := {
@@ -96,6 +105,7 @@ var feedback_log: Array[Dictionary] = []
 var route_counts := {"self": 0, "safe": 0, "ai": 0}
 var route_weights := {"self": 0, "safe": 0, "ai": 0}
 var realistic_losses: Array[Dictionary] = []
+var used_value_interactions := {}
 
 func reset_for_new_game() -> void:
 	current_chapter_id = "chapter_0"
@@ -105,20 +115,7 @@ func reset_for_new_game() -> void:
 	current_location = "邮轮甲板"
 	ai_stage = 0
 	ui_phase = "success_path"
-	stats = {
-		"heart": 42,
-		"sleep": 72,
-		"family": 40,
-		"clarity": 58,
-		"ai_dependence": 12,
-		"language_assimilation": 4,
-		"ability_exp": 82,
-		"resume_score": 92,
-		"network_score": 71,
-		"wealth_score": 88,
-		"stability_score": 96,
-		"success_progress": 100,
-	}
+	stats = WRITABLE_STAT_DEFAULTS.duplicate(true)
 	relationships = {
 		"linzhou": {"name": "林舟", "warmth": 48, "utility": 12},
 		"zhouxiao": {"name": "周骁", "warmth": 36, "utility": 8},
@@ -139,6 +136,7 @@ func reset_for_new_game() -> void:
 	route_counts = {"self": 0, "safe": 0, "ai": 0}
 	route_weights = {"self": 0, "safe": 0, "ai": 0}
 	realistic_losses.clear()
+	used_value_interactions.clear()
 	stats_changed.emit()
 	inventory_changed.emit()
 	objective_changed.emit()
@@ -159,9 +157,11 @@ func set_context(chapter_id: String, scene_id: String, location: String, time_la
 
 func apply_effects(effects: Dictionary) -> void:
 	if effects.has("stats"):
+		var stats_changed_this_apply := false
 		for key in effects["stats"].keys():
-			adjust_stat(key, int(effects["stats"][key]), false)
-		stats_changed.emit()
+			stats_changed_this_apply = _apply_stat_delta(str(key), int(effects["stats"][key])) or stats_changed_this_apply
+		if stats_changed_this_apply:
+			stats_changed.emit()
 
 	if effects.has("skills"):
 		for key in effects["skills"].keys():
@@ -183,7 +183,10 @@ func apply_effects(effects: Dictionary) -> void:
 			flags[key] = effects["flags"][key]
 
 	if effects.has("ai_stage"):
+		var previous_ai_stage := ai_stage
 		ai_stage = max(ai_stage, int(effects["ai_stage"]))
+		if ai_stage != previous_ai_stage:
+			ui_phase_changed.emit(ui_phase)
 
 	if effects.has("ui_phase"):
 		set_ui_phase(str(effects["ui_phase"]))
@@ -204,6 +207,39 @@ func apply_effects(effects: Dictionary) -> void:
 			str(settlement_data.get("body", "")),
 			str(settlement_data.get("kind", "info"))
 		)
+
+func value_interaction_key(kind: String, interaction_id: String) -> String:
+	if kind.is_empty() or interaction_id.is_empty():
+		return ""
+	return "%s:%s" % [kind, interaction_id]
+
+func has_used_value_interaction(key: String) -> bool:
+	if key.is_empty():
+		return false
+	return used_value_interactions.has(key)
+
+func try_mark_value_interaction(key: String, metadata: Dictionary = {}) -> bool:
+	if key.is_empty():
+		return true
+	if used_value_interactions.has(key):
+		return false
+	var entry := metadata.duplicate(true)
+	entry["chapter"] = str(entry.get("chapter", current_chapter_id))
+	entry["scene"] = str(entry.get("scene", current_scene_id))
+	used_value_interactions[key] = entry
+	return true
+
+func choice_affects_values(choice: Dictionary) -> bool:
+	if bool(choice.get("auto_final_ending", false)):
+		return true
+	var strategy := str(choice.get("strategy", STRATEGY_SAFE))
+	if strategy == STRATEGY_AI:
+		return true
+	var effects: Dictionary = choice.get("effects", {})
+	if _effects_affect_values(effects):
+		return true
+	var choice_id := str(choice.get("id", ""))
+	return _is_route_strategy(strategy) and _resolved_profile_weight(choice_id, effects, int(choice.get("profile_weight", -1))) > 0
 
 func normalized_effects_for_strategy(effects: Dictionary, strategy: String) -> Dictionary:
 	var normalized := effects.duplicate(true)
@@ -335,9 +371,9 @@ func resolve_final_ending() -> Dictionary:
 	var ratios: Dictionary = profile.get("ratios", {})
 	var clarity := int(stats.get("clarity", 0))
 	var ai_dependence := int(stats.get("ai_dependence", 0))
-	var language_assimilation := int(stats.get("language_assimilation", 0))
+	var language_assimilation := get_language_assimilation()
 	var stability := int(stats.get("stability_score", 0))
-	var success_progress := int(stats.get("success_progress", 0))
+	var success_progress := get_success_progress()
 	var memory_count := _memory_anchor_count()
 	var guardrail_count := _guardrail_count()
 	var success_gap := _total_success_gap()
@@ -387,11 +423,52 @@ func apply_final_ending() -> Dictionary:
 func get_success_targets() -> Dictionary:
 	return SUCCESS_TARGETS.duplicate(true)
 
+func get_stat_value(key: String) -> int:
+	if LEGACY_STAT_MAPPINGS.has(key):
+		return int(stats.get(str(LEGACY_STAT_MAPPINGS[key]), 0))
+	match key:
+		"success_progress":
+			return get_success_progress()
+		"language_assimilation":
+			return get_language_assimilation()
+		_:
+			return int(stats.get(key, 0))
+
+func get_success_progress() -> int:
+	var total := 0.0
+	for stat_id in SUCCESS_TARGETS.keys():
+		var target := int(SUCCESS_TARGETS[stat_id])
+		if target <= 0:
+			continue
+		total += min(1.0, float(get_stat_value(str(stat_id))) / float(target))
+	if SUCCESS_TARGETS.is_empty():
+		return 0
+	return clampi(int(round(total / float(SUCCESS_TARGETS.size()) * 100.0)), 0, 100)
+
+func get_success_rating() -> String:
+	var progress := get_success_progress()
+	if progress >= 95:
+		return "S"
+	if progress >= 85:
+		return "A"
+	if progress >= 70:
+		return "B"
+	if progress >= 55:
+		return "C"
+	return "D"
+
+func get_language_assimilation() -> int:
+	var profile := get_route_profile()
+	var ratios: Dictionary = profile.get("ratios", {})
+	var ai_ratio := float(ratios.get(STRATEGY_AI, 0.0))
+	var ai_dependence := int(stats.get("ai_dependence", 0))
+	return clampi(int(round(float(ai_dependence) * 0.5 + ai_ratio * 30.0 + float(ai_stage) * 3.0)), 0, 100)
+
 func get_success_gaps() -> Array[Dictionary]:
 	var gaps: Array[Dictionary] = []
 	for stat_id in SUCCESS_TARGETS.keys():
 		var target := int(SUCCESS_TARGETS[stat_id])
-		var current := int(stats.get(stat_id, 0))
+		var current := get_stat_value(str(stat_id))
 		var gap := target - current
 		if gap <= 0:
 			continue
@@ -418,6 +495,7 @@ func get_primary_success_gap() -> Dictionary:
 func get_alienation_visual_state() -> Dictionary:
 	var heart := int(stats.get(STAT_HEART, 0))
 	var ai_dependence := int(stats.get("ai_dependence", 0))
+	var intensity := _alienation_intensity(heart, ai_dependence)
 	if heart <= ALIENATION_PERSISTENT_HEART_MAX and ai_dependence >= ALIENATION_PERSISTENT_AI_MIN:
 		return {
 			"mode": ALIENATION_MODE_PERSISTENT,
@@ -426,11 +504,18 @@ func get_alienation_visual_state() -> Dictionary:
 		}
 
 	var chapter := _chapter_index()
-	if chapter >= ALIENATION_FLICKER_START_CHAPTER and chapter <= ALIENATION_FLICKER_END_CHAPTER:
+	if chapter >= ALIENATION_GRADIENT_START_CHAPTER and chapter <= ALIENATION_GRADIENT_END_CHAPTER:
 		return {
-			"mode": ALIENATION_MODE_FLICKER,
-			"intensity": 1.0,
+			"mode": ALIENATION_MODE_GRADIENT,
+			"intensity": intensity,
 			"reason": "reversal_chapter_%d" % chapter,
+		}
+
+	if intensity > 0.001:
+		return {
+			"mode": ALIENATION_MODE_GRADIENT,
+			"intensity": intensity,
+			"reason": "ai_drift",
 		}
 
 	return {
@@ -438,6 +523,28 @@ func get_alienation_visual_state() -> Dictionary:
 		"intensity": 0.0,
 		"reason": "before_reversal",
 	}
+
+func _alienation_intensity(heart: int, ai_dependence: int) -> float:
+	var chapter := _chapter_index()
+	var chapter_base := 0.0
+	if chapter >= 8:
+		chapter_base = 0.45
+	elif chapter >= 7:
+		chapter_base = 0.34
+	elif chapter >= 6:
+		chapter_base = 0.22
+	elif chapter >= 5:
+		chapter_base = 0.12
+
+	var profile := get_route_profile()
+	var ratios: Dictionary = profile.get("ratios", {})
+	var ai_ratio := float(ratios.get(STRATEGY_AI, 0.0))
+	var route_weight_scale := clampf(float(profile.get("total_weight", 0)) / 12.0, 0.0, 1.0)
+	var ai_pressure := clampf(float(ai_dependence - WRITABLE_STAT_DEFAULTS["ai_dependence"]) / 88.0, 0.0, 1.0) * 0.32
+	var route_pressure := ai_ratio * route_weight_scale * 0.22
+	var stage_pressure := clampf(float(ai_stage) / 9.0, 0.0, 1.0) * 0.16
+	var heart_pressure := clampf(float(35 - heart) / 35.0, 0.0, 1.0) * 0.18
+	return clampf(chapter_base + ai_pressure + route_pressure + stage_pressure + heart_pressure, 0.0, 0.92)
 
 func _success_gap_severity(gap: int) -> String:
 	if gap >= 15:
@@ -448,18 +555,12 @@ func _success_gap_severity(gap: int) -> String:
 
 func _success_gap_message(stat_id: String, _gap: int) -> String:
 	match stat_id:
-		"ability_exp":
-			return "建议优先处理项目、竞赛、代码或表达训练。"
 		"resume_score":
 			return "建议优先补足项目结果、履历包装和面试材料。"
 		"network_score":
 			return "建议维护高协同关系、内推入口和正式场合连接。"
-		"wealth_score":
-			return "建议靠近高回报城市、岗位、平台或可变现机会。"
 		"stability_score":
 			return "建议选择可解释、可交付、低风险路线。"
-		"success_progress":
-			return "建议推进当前主目标，减少低收益停留。"
 		_:
 			return "建议优先修正该指标，贴近成功路径目标线。"
 
@@ -470,9 +571,51 @@ func set_ui_phase(phase: String) -> void:
 	ui_phase_changed.emit(ui_phase)
 
 func adjust_stat(key: String, delta: int, emit_signal: bool = true) -> void:
-	stats[key] = clampi(int(stats.get(key, 0)) + delta, 0, 100)
-	if emit_signal:
+	var changed := _apply_stat_delta(key, delta)
+	if changed and emit_signal:
 		stats_changed.emit()
+
+func _apply_stat_delta(key: String, delta: int) -> bool:
+	var normalized_key := _normalized_stat_key(key)
+	if normalized_key.is_empty():
+		return false
+	var before := int(stats.get(normalized_key, 0))
+	var after := clampi(before + delta, 0, 100)
+	stats[normalized_key] = after
+	return after != before
+
+func _normalized_stat_key(key: String) -> String:
+	if LEGACY_STAT_MAPPINGS.has(key):
+		return str(LEGACY_STAT_MAPPINGS[key])
+	if DERIVED_ONLY_STATS.has(key):
+		return ""
+	if WRITABLE_STAT_DEFAULTS.has(key):
+		return key
+	return ""
+
+func _normalized_stats(raw_stats: Dictionary) -> Dictionary:
+	var normalized := WRITABLE_STAT_DEFAULTS.duplicate(true)
+	for key in WRITABLE_STAT_DEFAULTS.keys():
+		if raw_stats.has(key):
+			normalized[key] = clampi(int(raw_stats[key]), 0, 100)
+	return normalized
+
+func _normalized_stats_from_save(raw_value) -> Dictionary:
+	var raw_stats: Dictionary = {}
+	if raw_value is Dictionary:
+		raw_stats = raw_value
+	var normalized := _normalized_stats(raw_stats)
+	_merge_legacy_stat_into(normalized, raw_stats, "ability_exp", "resume_score", LEGACY_ABILITY_BASELINE)
+	_merge_legacy_stat_into(normalized, raw_stats, "wealth_score", "stability_score", LEGACY_WEALTH_BASELINE)
+	return normalized
+
+func _merge_legacy_stat_into(normalized: Dictionary, raw_stats: Dictionary, legacy_key: String, target_key: String, legacy_baseline: int) -> void:
+	if not raw_stats.has(legacy_key):
+		return
+	var legacy_value := clampi(int(raw_stats[legacy_key]), 0, 100)
+	var target_value := int(normalized.get(target_key, 0))
+	var legacy_gain: int = maxi(0, legacy_value - legacy_baseline)
+	normalized[target_key] = clampi(target_value + int(ceil(float(legacy_gain) * 0.25)), 0, 100)
 
 func adjust_relationship(friend_id: String, warmth_delta: int, utility_delta: int, emit_signal: bool = true) -> void:
 	if not relationships.has(friend_id):
@@ -568,7 +711,7 @@ func get_save_data() -> Dictionary:
 		"current_location": current_location,
 		"ai_stage": ai_stage,
 		"ui_phase": ui_phase,
-		"stats": stats.duplicate(true),
+		"stats": _normalized_stats(stats),
 		"skills": skills.duplicate(true),
 		"relationships": relationships.duplicate(true),
 		"inventory": inventory.duplicate(true),
@@ -581,6 +724,7 @@ func get_save_data() -> Dictionary:
 		"route_counts": route_counts.duplicate(true),
 		"route_weights": route_weights.duplicate(true),
 		"realistic_losses": realistic_losses.duplicate(true),
+		"used_value_interactions": used_value_interactions.duplicate(true),
 	}
 
 func load_save_data(data: Dictionary) -> void:
@@ -591,7 +735,7 @@ func load_save_data(data: Dictionary) -> void:
 	current_location = str(data.get("current_location", current_location))
 	ai_stage = int(data.get("ai_stage", ai_stage))
 	ui_phase = str(data.get("ui_phase", ui_phase))
-	stats = data.get("stats", stats)
+	stats = _normalized_stats_from_save(data.get("stats", stats))
 	skills = data.get("skills", skills)
 	relationships = data.get("relationships", relationships)
 	inventory.clear()
@@ -616,6 +760,7 @@ func load_save_data(data: Dictionary) -> void:
 	realistic_losses.clear()
 	for loss in data.get("realistic_losses", realistic_losses):
 		realistic_losses.append(loss)
+	used_value_interactions = data.get("used_value_interactions", {})
 	stats_changed.emit()
 	inventory_changed.emit()
 	objective_changed.emit()
@@ -687,19 +832,19 @@ func _self_friction_stat_deltas(tier: int, profile_weight: int) -> Dictionary:
 		return {}
 	if chapter <= 2:
 		if tier >= 3:
-			return {"family": -3, "stability_score": -2, "success_progress": -1}
+			return {"family": -3, "stability_score": -2}
 		if tier >= 2:
 			return {"family": -2, "stability_score": -1}
 		return {"family": -scale}
 	if chapter <= 5:
 		if tier >= 3:
-			return {"resume_score": -3, "network_score": -2, "success_progress": -1}
+			return {"resume_score": -3, "network_score": -2}
 		if tier >= 2:
 			return {"resume_score": -2, "network_score": -1}
 		return {"resume_score": -scale}
 	if chapter <= 7:
 		if tier >= 3:
-			return {"resume_score": -3, "stability_score": -3, "success_progress": -2}
+			return {"resume_score": -3, "stability_score": -3}
 		if tier >= 2:
 			return {"resume_score": -2, "stability_score": -2}
 		return {"stability_score": -scale}
@@ -717,9 +862,9 @@ func _final_ending_effects(ending: String, result_text: String) -> Dictionary:
 		"self_return":
 			return {"stats": {"clarity": 20, "ai_dependence": -8}, "flags": {"ending": "self_return", "final_ending": "self_return"}, "settlement": {"id": "ending_self", "title": "微弱反抗结局", "body": result_text}, "ai_stage": 8}
 		"optimized_life":
-			return {"stats": {"success_progress": 15, "resume_score": 8, "ai_dependence": 12, "language_assimilation": 12, "clarity": -12}, "flags": {"ending": "optimized_life", "final_ending": "optimized_life"}, "settlement": {"id": "ending_ai", "title": "顺从结局", "body": result_text}, "ai_stage": 9}
+			return {"stats": {"resume_score": 8, "ai_dependence": 12, "clarity": -12}, "flags": {"ending": "optimized_life", "final_ending": "optimized_life"}, "settlement": {"id": "ending_ai", "title": "顺从结局", "body": result_text}, "ai_stage": 9}
 		_:
-			return {"stats": {"stability_score": 8, "clarity": 6, "success_progress": 4}, "flags": {"ending": "coexistence", "final_ending": "coexistence"}, "settlement": {"id": "ending_safe", "title": "共存结局", "body": result_text}, "ai_stage": 8}
+			return {"stats": {"stability_score": 8, "clarity": 6}, "flags": {"ending": "coexistence", "final_ending": "coexistence"}, "settlement": {"id": "ending_safe", "title": "共存结局", "body": result_text}, "ai_stage": 8}
 
 func _final_ending_result_text(ending: String, resolved: Dictionary) -> String:
 	var profile: Dictionary = resolved.get("profile", {})
@@ -793,6 +938,14 @@ func _total_route_weight() -> int:
 
 func _is_route_strategy(strategy: String) -> bool:
 	return ROUTE_KEYS.has(strategy)
+
+func _effects_affect_values(effects: Dictionary) -> bool:
+	for key in ["stats", "skills", "relationships"]:
+		if effects.has(key) and not effects[key].is_empty():
+			return true
+	if effects.has("ai_stage") or effects.has("settlement"):
+		return true
+	return false
 
 func _chapter_index() -> int:
 	var marker := "chapter_"

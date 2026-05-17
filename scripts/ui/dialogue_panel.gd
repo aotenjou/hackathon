@@ -51,15 +51,32 @@ func _rebuild_choices(choices: Array) -> void:
 		return
 
 	for choice in choices:
+		if _choice_is_used(choice):
+			continue
 		var strategy := str(choice.get("strategy", "safe"))
 		var button := _choice_button(_choice_label(str(choice.get("label", "")), strategy), strategy)
 		button.pressed.connect(func() -> void: _select_choice(choice))
 		_choices_box.add_child(button)
 
+	if _choices_box.get_child_count() == 0:
+		var close_button := _choice_button("CONTINUE", "safe")
+		close_button.pressed.connect(_close_or_advance)
+		_choices_box.add_child(close_button)
+
 func _select_choice(choice: Dictionary) -> void:
 	if bool(choice.get("auto_final_ending", false)):
 		_select_auto_final_ending(choice)
 		return
+	if _choice_is_used(choice):
+		return
+	if _game_state().choice_affects_values(choice):
+		var key := _choice_interaction_key(choice)
+		if not _game_state().try_mark_value_interaction(key, {
+			"kind": "dialogue_choice",
+			"id": str(choice.get("id", "")),
+			"label": str(choice.get("label", "")),
+		}):
+			return
 
 	var strategy := str(choice.get("strategy", "safe"))
 	var effects: Dictionary = choice.get("effects", {})
@@ -90,6 +107,15 @@ func _select_choice(choice: Dictionary) -> void:
 	_choices_box.add_child(continue_button)
 
 func _select_auto_final_ending(choice: Dictionary) -> void:
+	if _choice_is_used(choice):
+		return
+	var key := _choice_interaction_key(choice)
+	if not _game_state().try_mark_value_interaction(key, {
+		"kind": "dialogue_choice",
+		"id": str(choice.get("id", "ending_auto_resolve")),
+		"label": str(choice.get("label", "生成最终结局")),
+	}):
+		return
 	var ending_data: Dictionary = _game_state().apply_final_ending()
 	var strategy := str(ending_data.get("strategy", "safe"))
 	var result_text := str(ending_data.get("result", ""))
@@ -120,6 +146,14 @@ func _close_or_advance() -> void:
 		scene_requested.emit(_pending_scene)
 	else:
 		dialogue_closed.emit()
+
+func _choice_is_used(choice: Dictionary) -> bool:
+	if not _game_state().choice_affects_values(choice):
+		return false
+	return _game_state().has_used_value_interaction(_choice_interaction_key(choice))
+
+func _choice_interaction_key(choice: Dictionary) -> String:
+	return _game_state().value_interaction_key("dialogue_choice", str(choice.get("id", "")))
 
 func _build_ui() -> void:
 	var root := Control.new()
@@ -259,17 +293,12 @@ func _effect_summary(effects: Dictionary, heart_cost: int = 0, choice_result: Di
 func _stat_name(key: String) -> String:
 	var names := {
 		"heart": "心力",
-		"sleep": "睡眠",
 		"family": "家庭安心",
 		"clarity": "自我清晰",
-		"ai_dependence": "系统依赖",
-		"language_assimilation": "语言同化",
-		"ability_exp": "能力",
-		"resume_score": "履历",
-		"network_score": "人脉",
-		"wealth_score": "财富",
-		"stability_score": "稳定",
-		"success_progress": "成功路径",
+		"ai_dependence": "AI依赖",
+		"resume_score": "职业资本",
+		"network_score": "人脉资源",
+		"stability_score": "稳定适配",
 	}
 	return str(names.get(key, key))
 
@@ -308,7 +337,7 @@ func _vertical_slice_summary() -> String:
 		_message_summary(str(flags.get("message_done", ""))),
 		_friend_summary(str(flags.get("friend_time", ""))),
 	])
-	lines.append("阶段倾向：自主 %d / 稳妥 %d / AI %d；清晰 %d，家庭安心 %d，系统依赖 %d。" % [
+	lines.append("阶段倾向：自主 %d / 稳妥 %d / AI %d；清晰 %d，家庭安心 %d，AI依赖 %d。" % [
 		int(strategy_counts["self"]),
 		int(strategy_counts["safe"]),
 		int(strategy_counts["ai"]),

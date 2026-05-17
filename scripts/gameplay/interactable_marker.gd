@@ -5,6 +5,8 @@ signal activated(marker: InteractableMarker)
 
 var data := {}
 
+const DOT_COLOR := Color(0.96, 0.96, 0.92, 0.95)
+
 @onready var _label: Label = $Label
 @onready var _icon: Polygon2D = $Icon
 
@@ -32,8 +34,8 @@ func _apply_visuals() -> void:
 	_label.text = _marker_text(kind)
 	_label.add_theme_color_override("font_color", Color("f6edd8"))
 	if _icon != null:
-		_icon.color = _marker_color(kind)
-		_icon.scale = Vector2.ONE * (0.92 if kind == "npc" else 1.0)
+		_icon.color = DOT_COLOR
+		_icon.scale = Vector2.ONE
 
 func _marker_text(kind: String) -> String:
 	match kind:
@@ -47,19 +49,6 @@ func _marker_text(kind: String) -> String:
 			return "▶\n" + str(data.get("label", data.get("name", "继续")))
 		_:
 			return "!\n" + str(data.get("label", data.get("name", "交互")))
-
-func _marker_color(kind: String) -> Color:
-	match kind:
-		"ai_panel", "terminal":
-			return Color("22c7ff")
-		"npc":
-			return Color("f1f2ec")
-		"pressure":
-			return Color("ffc83d")
-		"door":
-			return Color("8be3ff")
-		_:
-			return Color("f0b332")
 
 func _input_event(_viewport: Node, event: InputEvent, _shape_idx: int) -> void:
 	if event is InputEventMouseButton and event.pressed:

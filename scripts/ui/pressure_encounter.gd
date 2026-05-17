@@ -9,6 +9,7 @@ var _heart := 0
 var _preparedness := 0
 var _rounds := 0
 var _done := false
+var _encounter_id := ""
 
 var _title: Label
 var _body: Label
@@ -29,6 +30,7 @@ func _ready() -> void:
 	visible = false
 
 func start(encounter_id: String) -> void:
+	_encounter_id = encounter_id
 	_encounter = _chapter_data().get_pressure(encounter_id)
 	if _encounter.is_empty():
 		return
@@ -43,6 +45,9 @@ func start(encounter_id: String) -> void:
 	if not route_note.is_empty():
 		_body.text += "\n\n" + route_note
 	visible = true
+	if _game_state().has_used_value_interaction(_pressure_result_key()):
+		_done = true
+		_body.text += "\n\n该压力遭遇已结算。"
 	_refresh()
 
 func _refresh() -> void:
@@ -60,23 +65,42 @@ func _refresh() -> void:
 		_actions_box.add_child(continue_button)
 		return
 
+	var enabled_action_count := 0
 	for action in _encounter.get("actions", []):
+		if _action_is_used(action):
+			continue
 		var strategy := str(action.get("strategy", "safe"))
 		var button := _action_button(_action_label(str(action.get("label", "")), strategy), strategy)
-		var required := int(action.get("requires_preparedness", 0))
-		var relationship_requirement: Dictionary = action.get("requires_relationship", {})
-		if required > _preparedness:
+		if not _preparedness_requirement_met(action):
 			button.disabled = true
 			button.text += "（准备不足）"
-		elif not _relationship_requirement_met(relationship_requirement):
+		elif not _relationship_requirement_met(action.get("requires_relationship", {})):
 			button.disabled = true
 			button.text += "（关系不足）"
 		if bool(action.get("ai_recommended", false)):
 			button.text = "AI推荐：" + button.text
 		button.pressed.connect(func() -> void: _select_action(action))
 		_actions_box.add_child(button)
+		if not button.disabled:
+			enabled_action_count += 1
+
+	if enabled_action_count == 0:
+		_finish_encounter(false)
+		_refresh()
 
 func _select_action(action: Dictionary) -> void:
+	if _done or _action_is_used(action):
+		return
+	if not _action_requirements_met(action):
+		return
+	var action_id := str(action.get("id", ""))
+	if not _game_state().try_mark_value_interaction(_action_interaction_key(action), {
+		"kind": "pressure_action",
+		"id": action_id,
+		"encounter_id": _encounter_id,
+		"label": str(action.get("label", "")),
+	}):
+		return
 	var strategy := str(action.get("strategy", "safe"))
 	_pressure = clampi(_pressure + int(action.get("pressure_delta", 0)), 0, 100)
 	var heart_delta := int(action.get("heart_delta", 0))
@@ -104,17 +128,44 @@ func _select_action(action: Dictionary) -> void:
 	_body.text = str(action.get("result", ""))
 
 	if _pressure <= 0:
-		_done = true
-		var success_effects: Dictionary = _game_state().normalized_effects_for_strategy(_encounter.get("success_effects", {}), "safe")
-		_game_state().apply_effects(success_effects)
-		_body.text += "\n\n" + str(_encounter.get("success_text", ""))
+		_finish_encounter(true)
 	elif _heart <= 0 or _rounds <= 0:
-		_done = true
-		var failure_effects: Dictionary = _game_state().normalized_effects_for_strategy(_encounter.get("failure_effects", {}), "safe")
-		_game_state().apply_effects(failure_effects)
-		_body.text += "\n\n" + str(_encounter.get("failure_text", ""))
+		_finish_encounter(false)
 
 	_refresh()
+
+func _finish_encounter(success: bool) -> void:
+	if _done:
+		return
+	_done = true
+	var outcome := "success" if success else "failure"
+	var result_key := _pressure_result_key()
+	if _game_state().try_mark_value_interaction(result_key, {
+		"kind": "pressure_result",
+		"id": _encounter_id,
+		"outcome": outcome,
+		"title": str(_encounter.get("title", "")),
+	}):
+		var effect_key := "success_effects" if success else "failure_effects"
+		var effects: Dictionary = _game_state().normalized_effects_for_strategy(_encounter.get(effect_key, {}), "safe")
+		_game_state().apply_effects(effects)
+	var text_key := "success_text" if success else "failure_text"
+	_body.text += "\n\n" + str(_encounter.get(text_key, ""))
+
+func _action_is_used(action: Dictionary) -> bool:
+	return _game_state().has_used_value_interaction(_action_interaction_key(action))
+
+func _action_interaction_key(action: Dictionary) -> String:
+	return _game_state().value_interaction_key("pressure_action", str(action.get("id", "")))
+
+func _pressure_result_key() -> String:
+	return _game_state().value_interaction_key("pressure_result", _encounter_id)
+
+func _action_requirements_met(action: Dictionary) -> bool:
+	return _preparedness_requirement_met(action) and _relationship_requirement_met(action.get("requires_relationship", {}))
+
+func _preparedness_requirement_met(action: Dictionary) -> bool:
+	return int(action.get("requires_preparedness", 0)) <= _preparedness
 
 func _build_ui() -> void:
 	var root := Control.new()
@@ -245,11 +296,10 @@ func _stat_name(key: String) -> String:
 		"heart": "心力",
 		"family": "家庭安心",
 		"clarity": "自我清晰",
-		"ai_dependence": "系统依赖",
-		"language_assimilation": "语言同化",
-		"resume_score": "履历",
-		"stability_score": "稳定",
-		"success_progress": "成功路径",
+		"ai_dependence": "AI依赖",
+		"resume_score": "职业资本",
+		"network_score": "人脉资源",
+		"stability_score": "稳定适配",
 	}
 	return str(names.get(key, key))
 

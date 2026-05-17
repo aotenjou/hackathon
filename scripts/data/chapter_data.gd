@@ -621,7 +621,7 @@ func _build_dialogue() -> void:
 			"speaker": "系统",
 			"line": "职业成就已解锁：年薪 128 万，项目 28 个，行业评分 S+。海风很好，一切都像终于抵达。",
 			"choices": [
-				_choice("cruise_success_view", "查看成功路径报告", STRATEGY_SAFE, "财富值、履历值、稳定度、人脉值全部保持在高位。你几乎找不到失败的痕迹。", {"stats": {"heart": 2}, "flags": {"viewed_success": true}}),
+				_choice("cruise_success_view", "查看成功路径报告", STRATEGY_SAFE, "履历值、稳定度、人脉值全部保持在高位。你几乎找不到失败的痕迹。", {"stats": {"heart": 2}, "flags": {"viewed_success": true}}),
 				_choice("cruise_success_doubt", "想一想自己为什么会站在这里", STRATEGY_SELF, "你想起很多台阶、通知、面试和文件名，却很难想起某个真正开始的瞬间。", {"stats": {"clarity": 4}, "flags": {"viewed_success": true}}),
 			],
 		},
@@ -630,7 +630,7 @@ func _build_dialogue() -> void:
 			"line": "许临、何启朗、沈柚都在名单里。名字后面跟着职位、机构、行业标签。",
 			"choices": [
 				_choice("banquet_read", "确认自己的座位", STRATEGY_SAFE, "座位在主桌旁边。系统评价：高价值社交环境。", {"stats": {"network_score": 1}}),
-				_choice("banquet_ai", "让 AI 生成寒暄话术", STRATEGY_AI, "AI 已生成 6 条合适寒暄。你不用担心开口时显得陌生。", {"stats": {"ai_dependence": 4, "language_assimilation": 2, "network_score": 2}, "ai_stage": 1}),
+				_choice("banquet_ai", "让 AI 生成寒暄话术", STRATEGY_AI, "AI 已生成 6 条合适寒暄。你不用担心开口时显得陌生。", {"stats": {"ai_dependence": 4, "network_score": 2}, "ai_stage": 1}),
 			],
 		},
 			"d_life_replay": {
@@ -662,7 +662,7 @@ func _build_dialogue() -> void:
 				"line": "老师让我统计留言墙。每个人都要有一句体面的话，不然贴出来会很尴尬。",
 				"choices": [
 					_choice("shenyou_help", "帮她贴留言墙", STRATEGY_SELF, "你看见很多没写完的话被折到背面。沈柚说这样也算照顾大家。", {"relationships": {"shenyou": {"warmth": 6, "utility": 1}}, "items": ["留言墙胶带"]}),
-					_choice("shenyou_template", "一起整理标准模板", STRATEGY_SAFE, "模板让事情推进得很快，也让所有人的未来看上去差不多。", {"stats": {"stability_score": 3, "language_assimilation": 1}, "relationships": {"shenyou": {"warmth": 2, "utility": 3}}}),
+					_choice("shenyou_template", "一起整理标准模板", STRATEGY_SAFE, "模板让事情推进得很快，也让所有人的未来看上去差不多。", {"stats": {"stability_score": 3}, "relationships": {"shenyou": {"warmth": 2, "utility": 3}}}),
 				],
 			},
 			"d_chenwang_hallway": {
@@ -686,9 +686,9 @@ func _build_dialogue() -> void:
 			"speaker": "林舟",
 			"line": "你也要让那个系统替你想吗？我不是说它没用，我只是觉得它不认识你。",
 			"choices": [
-				_choice("linzhou_self", "说自己也没想清楚", STRATEGY_SELF, "林舟把试玩包发给你：那你有空玩玩。我也没想清楚。", {"stats": {"clarity": 5, "success_progress": -1}, "relationships": {"linzhou": {"warmth": 8, "utility": -2}}, "items": ["林舟的试玩包"]}),
+				_choice("linzhou_self", "说自己也没想清楚", STRATEGY_SELF, "林舟把试玩包发给你：那你有空玩玩。我也没想清楚。", {"stats": {"clarity": 5}, "relationships": {"linzhou": {"warmth": 8, "utility": -2}}, "items": ["林舟的试玩包"]}),
 				_choice("linzhou_safe", "说先填稳一点以后再看", STRATEGY_SAFE, "林舟点点头，没有反驳。他说：也行，至少你知道自己在怕什么。", {"stats": {"stability_score": 4, "family": 2}, "relationships": {"linzhou": {"warmth": 1, "utility": 2}}}),
-				_choice("linzhou_ai", "让 AI 帮忙解释你的选择", STRATEGY_AI, "回复很完整：我会在稳定路径中保留探索空间。林舟看了很久，只回了一个嗯。", {"stats": {"resume_score": 4, "ai_dependence": 5, "language_assimilation": 4}, "relationships": {"linzhou": {"warmth": -5, "utility": 5}}, "ai_stage": 1}),
+				_choice("linzhou_ai", "让 AI 帮忙解释你的选择", STRATEGY_AI, "回复很完整：我会在稳定路径中保留探索空间。林舟看了很久，只回了一个嗯。", {"stats": {"resume_score": 4, "ai_dependence": 5}, "relationships": {"linzhou": {"warmth": -5, "utility": 5}}, "ai_stage": 1}),
 			],
 		},
 		"d_teacher_hallway": {
@@ -706,16 +706,16 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("notice_ignore", "暂时关闭", STRATEGY_SELF, "通知缩回右侧，但角标还亮着。", {"stats": {"clarity": 2}}),
 				_choice("notice_walk_to_computer", "关闭建议，自己去机房", STRATEGY_SAFE, "你没有打开建议详情，只记住机房的位置。系统还在右侧发亮，但路已经很清楚。", {"stats": {"clarity": 1}}, "computer_room"),
-				_choice("notice_open", "打开建议", STRATEGY_AI, "系统将普通问题整理成可比较表格。你第一次觉得轻松。", {"stats": {"heart": 5, "ai_dependence": 5, "success_progress": 2}, "ai_stage": 1}, "computer_room"),
+				_choice("notice_open", "打开建议", STRATEGY_AI, "系统将普通问题整理成可比较表格。你第一次觉得轻松。", {"stats": {"heart": 5, "ai_dependence": 5}, "ai_stage": 1}, "computer_room"),
 			],
 		},
 		"d_volunteer_terminal": {
 			"speaker": "AI 志愿系统",
 			"line": "请输入成绩、城市偏好、家庭期待、兴趣关键词。系统将生成就业最大化志愿表。",
 			"choices": [
-				_choice("volunteer_self", "自己写：我想做和交互、故事有关的东西", STRATEGY_SELF, "你写得很慢，删了三次。最后那句话不漂亮：我还没想清楚，但我想试试。", {"stats": {"clarity": 8, "family": -4, "success_progress": -2}, "skills": {"expression": 1}, "items": ["手写志愿草稿"], "flags": {"volunteer_done": "self"}}),
-				_choice("volunteer_safe", "选择热门计算机路线", STRATEGY_SAFE, "系统显示录取概率稳定，父母可接受度较高。你保存了最终志愿表。", {"stats": {"family": 8, "stability_score": 8, "resume_score": 5, "success_progress": 4}, "items": ["最终志愿表_家长确认版"], "flags": {"volunteer_done": "safe"}}),
-				_choice("volunteer_ai", "让 AI 生成就业最大化方案", STRATEGY_AI, "已生成 optimal_path_generated.pdf。路径兼顾录取概率、就业稳定性与家庭沟通成本。", {"stats": {"family": 12, "stability_score": 9, "resume_score": 9, "ai_dependence": 8, "language_assimilation": 5, "success_progress": 8}, "items": ["optimal_path_generated.pdf"], "flags": {"volunteer_done": "ai"}, "ai_stage": 1}),
+				_choice("volunteer_self", "自己写：我想做和交互、故事有关的东西", STRATEGY_SELF, "你写得很慢，删了三次。最后那句话不漂亮：我还没想清楚，但我想试试。", {"stats": {"clarity": 8, "family": -4}, "skills": {"expression": 1}, "items": ["手写志愿草稿"], "flags": {"volunteer_done": "self"}}),
+				_choice("volunteer_safe", "选择热门计算机路线", STRATEGY_SAFE, "系统显示录取概率稳定，父母可接受度较高。你保存了最终志愿表。", {"stats": {"family": 8, "stability_score": 8, "resume_score": 5}, "items": ["最终志愿表_家长确认版"], "flags": {"volunteer_done": "safe"}}),
+				_choice("volunteer_ai", "让 AI 生成就业最大化方案", STRATEGY_AI, "已生成 optimal_path_generated.pdf。路径兼顾录取概率、就业稳定性与家庭沟通成本。", {"stats": {"family": 12, "stability_score": 9, "resume_score": 9, "ai_dependence": 8}, "items": ["optimal_path_generated.pdf"], "flags": {"volunteer_done": "ai"}, "ai_stage": 1}),
 			],
 		},
 			"d_after_volunteer_choice": {
@@ -723,7 +723,7 @@ func _build_dialogue() -> void:
 			"line": "志愿草稿已保存。今晚你还要把它解释给家里听。",
 			"choices": [
 				_choice("to_dinner", "回家吃饭", STRATEGY_SAFE, "饭桌上的筷子声比平时清楚。压力遭遇即将开始。", {}, "dinner_table"),
-				_choice("recheck_ai", "让 AI 再润色一版解释", STRATEGY_AI, "已生成家长沟通版说明。它说得比你成熟。", {"stats": {"family": 4, "ai_dependence": 3, "language_assimilation": 2}, "flags": {"parent_script": true}, "ai_stage": 1}, "dinner_table"),
+				_choice("recheck_ai", "让 AI 再润色一版解释", STRATEGY_AI, "已生成家长沟通版说明。它说得比你成熟。", {"stats": {"family": 4, "ai_dependence": 3}, "flags": {"parent_script": true}, "ai_stage": 1}, "dinner_table"),
 			],
 			},
 			"d_ch1_night_settlement": {
@@ -731,7 +731,7 @@ func _build_dialogue() -> void:
 				"line": "手机屏幕显示：离开小城概率提升。父母房间的灯很晚才灭。系统建议明日继续巩固成功路径。",
 				"choices": [
 					_choice("ch1_settlement_self", "记下自己没说完的话", STRATEGY_SELF, "你在草稿末尾写：我不是完全确定。它没有被上传，但你知道它在那里。", {"stats": {"clarity": 4}, "emotion_cards": {"add": ["不知道怎么说"]}, "wishes": {"complete": ["完成志愿确认"], "current": "写下毕业留言"}, "settlement": {"id": "ch1_night", "title": "阶段 1 结算", "body": "志愿表已经保存。稳妥或智能路线带来真实安心，自由路线留下更难解释的草稿。"}} , "graduation_field"),
-					_choice("ch1_settlement_ai", "采纳 AI 明日建议", STRATEGY_AI, "明日计划变得清楚：留言、拍照、维持高价值关系。你第一次感谢这种清楚。", {"stats": {"success_progress": 4, "ai_dependence": 4}, "emotion_cards": {"add": ["AI 已规划今日"]}, "wishes": {"complete": ["完成志愿确认"], "current": "写下毕业留言"}, "settlement": {"id": "ch1_night_ai", "title": "阶段 1 结算", "body": "AI 让家庭沟通更顺，成功路径更亮。代价还很轻，只像屏幕暖色少了一点。"}, "ai_stage": 2}, "graduation_field"),
+					_choice("ch1_settlement_ai", "采纳 AI 明日建议", STRATEGY_AI, "明日计划变得清楚：留言、拍照、维持高价值关系。你第一次感谢这种清楚。", {"stats": {"ai_dependence": 4}, "emotion_cards": {"add": ["AI 已规划今日"]}, "wishes": {"complete": ["完成志愿确认"], "current": "写下毕业留言"}, "settlement": {"id": "ch1_night_ai", "title": "阶段 1 结算", "body": "AI 让家庭沟通更顺，成功路径更亮。代价还很轻，只像屏幕暖色少了一点。"}, "ai_stage": 2}, "graduation_field"),
 				],
 			},
 		"d_gate_volunteer_required": {
@@ -745,19 +745,19 @@ func _build_dialogue() -> void:
 			"speaker": "留言墙",
 			"line": "每个人都要写一句给未来的自己。纸很小，未来却被写得很完整。",
 			"choices": [
-				_choice("message_self", "自己写一句不成熟的话", STRATEGY_SELF, "你写下：如果以后我忘了今天，就回来看看。字不好看，但你记得自己写的时候手在抖。", {"stats": {"clarity": 8, "success_progress": -1}, "items": ["毕业留言纸条"], "flags": {"message_done": "self"}}),
-				_choice("message_safe", "写标准励志话术", STRATEGY_SAFE, "愿你不负青春，奔赴山海。老师说写得不错，适合贴在留言墙中间。", {"stats": {"stability_score": 4, "family": 2, "success_progress": 2}, "flags": {"message_done": "safe"}}),
-				_choice("message_ai", "让 AI 生成更完整的留言", STRATEGY_AI, "已生成：愿你在变化的时代保持热爱与韧性。你看着它，想不起刚才自己原本要写什么。", {"stats": {"resume_score": 3, "ai_dependence": 6, "language_assimilation": 5, "clarity": -6, "success_progress": 4}, "flags": {"message_done": "ai"}, "ai_stage": 1}),
+				_choice("message_self", "自己写一句不成熟的话", STRATEGY_SELF, "你写下：如果以后我忘了今天，就回来看看。字不好看，但你记得自己写的时候手在抖。", {"stats": {"clarity": 8}, "items": ["毕业留言纸条"], "flags": {"message_done": "self"}}),
+				_choice("message_safe", "写标准励志话术", STRATEGY_SAFE, "愿你不负青春，奔赴山海。老师说写得不错，适合贴在留言墙中间。", {"stats": {"stability_score": 4, "family": 2}, "flags": {"message_done": "safe"}}),
+				_choice("message_ai", "让 AI 生成更完整的留言", STRATEGY_AI, "已生成：愿你在变化的时代保持热爱与韧性。你看着它，想不起刚才自己原本要写什么。", {"stats": {"resume_score": 3, "ai_dependence": 6, "clarity": -6}, "flags": {"message_done": "ai"}, "ai_stage": 1}),
 			],
 		},
 		"d_friend_time": {
 			"speaker": "系统",
 			"line": "典礼后只剩最后一段自由时间。你只能认真陪一个人。",
 			"choices": [
-				_choice("time_linzhou", "陪林舟去机房看未完成的游戏", STRATEGY_SELF, "游戏很粗糙，主角卡在毕业前夜。林舟说：你别急着评价，我只是想让它存在。", {"stats": {"clarity": 7, "heart": -3, "success_progress": -2}, "relationships": {"linzhou": {"warmth": 12, "utility": -3}}, "items": ["未完成的小程序记忆"], "flags": {"friend_time": "linzhou"}}),
+				_choice("time_linzhou", "陪林舟去机房看未完成的游戏", STRATEGY_SELF, "游戏很粗糙，主角卡在毕业前夜。林舟说：你别急着评价，我只是想让它存在。", {"stats": {"clarity": 7, "heart": -3}, "relationships": {"linzhou": {"warmth": 12, "utility": -3}}, "items": ["未完成的小程序记忆"], "flags": {"friend_time": "linzhou"}}),
 				_choice("time_zhouxiao", "去校门口帮周骁搬维修零件", STRATEGY_SELF, "周骁说你穿校服搬东西挺怪，但还是给你买了冰水。", {"stats": {"clarity": 4, "heart": -4}, "relationships": {"zhouxiao": {"warmth": 12, "utility": -1}}, "items": ["校门口冰水"], "flags": {"friend_time": "zhouxiao"}}),
-				_choice("time_heqilang", "帮何启朗整理优秀毕业生资料", STRATEGY_SAFE, "资料做得很漂亮。何启朗说，以后很多机会其实从这种小事开始。", {"stats": {"resume_score": 6, "network_score": 5, "stability_score": 4, "success_progress": 4}, "relationships": {"heqilang": {"warmth": 4, "utility": 8}}, "flags": {"friend_time": "heqilang"}}),
-				_choice("time_ai", "让 AI 排序最值得维持的关系", STRATEGY_AI, "AI 建议优先维护高路径协同对象。林舟的消息被折叠为：低收益沟通，可稍后。", {"stats": {"network_score": 6, "ai_dependence": 8, "language_assimilation": 4, "clarity": -5, "success_progress": 5}, "relationships": {"linzhou": {"warmth": -8, "utility": 8}, "heqilang": {"warmth": 1, "utility": 10}}, "flags": {"friend_time": "ai"}, "ai_stage": 2}),
+				_choice("time_heqilang", "帮何启朗整理优秀毕业生资料", STRATEGY_SAFE, "资料做得很漂亮。何启朗说，以后很多机会其实从这种小事开始。", {"stats": {"resume_score": 6, "network_score": 5, "stability_score": 4}, "relationships": {"heqilang": {"warmth": 4, "utility": 8}}, "flags": {"friend_time": "heqilang"}}),
+				_choice("time_ai", "让 AI 排序最值得维持的关系", STRATEGY_AI, "AI 建议优先维护高价值关系。林舟的消息被折叠为：低收益沟通，可稍后。", {"stats": {"network_score": 6, "ai_dependence": 8, "clarity": -5}, "relationships": {"linzhou": {"warmth": -8, "utility": 8}, "heqilang": {"warmth": 1, "utility": 10}}, "flags": {"friend_time": "ai"}, "ai_stage": 2}),
 			],
 		},
 		"d_vertical_slice_ending": {
@@ -782,9 +782,9 @@ func _build_dialogue() -> void:
 			"speaker": "林舟",
 			"line": "我想做一个会失败的游戏原型。不是为了比赛，是为了看看它能不能真的让人留下来。",
 			"choices": [
-				_choice("campus_project_self", "陪他先做可玩的部分", STRATEGY_SELF, "你们把排行榜删掉，只留下一个会卡住的毕业前夜。它不完整，但终于像你们自己的项目。", {"stats": {"clarity": 8, "heart": -4, "success_progress": -2}, "relationships": {"linzhou": {"warmth": 12, "utility": -4}}, "items": ["大学项目原型"], "flags": {"campus_project": "self", "project_done": "self"}, "ai_stage": 2}),
+				_choice("campus_project_self", "陪他先做可玩的部分", STRATEGY_SELF, "你们把排行榜删掉，只留下一个会卡住的毕业前夜。它不完整，但终于像你们自己的项目。", {"stats": {"clarity": 8, "heart": -4}, "relationships": {"linzhou": {"warmth": 12, "utility": -4}}, "items": ["大学项目原型"], "flags": {"campus_project": "self", "project_done": "self"}, "ai_stage": 2}),
 				_choice("campus_project_safe", "把原型整理成比赛规格", STRATEGY_SAFE, "林舟没有反对。他说也许先活下来比较重要。你们开始补需求文档和答辩结构。", {"stats": {"resume_score": 5, "stability_score": 4}, "relationships": {"linzhou": {"warmth": 2, "utility": 4}}, "items": ["项目答辩大纲"], "flags": {"campus_project": "safe", "project_done": "safe"}, "ai_stage": 2}),
-				_choice("campus_project_ai", "让 AI 生成获奖版本", STRATEGY_AI, "系统把失败、停顿和不确定性替换成成长闭环。林舟看完说：它赢的概率很高，但已经不是那个东西了。", {"stats": {"resume_score": 8, "ai_dependence": 8, "language_assimilation": 5, "clarity": -5, "success_progress": 5}, "relationships": {"linzhou": {"warmth": -8, "utility": 7}}, "items": ["获奖概率优化版原型"], "flags": {"campus_project": "ai", "project_done": "ai"}, "ai_stage": 3}),
+				_choice("campus_project_ai", "让 AI 生成获奖版本", STRATEGY_AI, "系统把失败、停顿和不确定性替换成成长闭环。林舟看完说：它赢的概率很高，但已经不是那个东西了。", {"stats": {"resume_score": 8, "ai_dependence": 8, "clarity": -5}, "relationships": {"linzhou": {"warmth": -8, "utility": 7}}, "items": ["获奖概率优化版原型"], "flags": {"campus_project": "ai", "project_done": "ai"}, "ai_stage": 3}),
 			],
 		},
 			"d_campus_ai_project_panel": {
@@ -793,7 +793,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("campus_panel_self", "手动保留林舟的项目时间", STRATEGY_SELF, "计划表出现一块低收益空白。你知道它不漂亮，但那是你亲手留出来的。", {"stats": {"clarity": 5, "network_score": -1}, "relationships": {"linzhou": {"warmth": 5, "utility": -2}}, "flags": {"campus_schedule": "self"}, "ai_stage": 2}),
 				_choice("campus_panel_safe", "平衡绩点和比赛", STRATEGY_SAFE, "系统生成中性排期：足够体面，也足够忙。", {"stats": {"resume_score": 4, "stability_score": 5, "heart": -2}, "flags": {"campus_schedule": "safe"}, "ai_stage": 2}),
-				_choice("campus_panel_ai", "启用最优投入比", STRATEGY_AI, "AI 折叠低收益沟通，把可量化成果推到最前。你的日程第一次不像生活，像看板。", {"stats": {"resume_score": 7, "network_score": 3, "ai_dependence": 7, "language_assimilation": 3, "clarity": -4}, "relationships": {"linzhou": {"warmth": -4, "utility": 5}}, "flags": {"campus_schedule": "ai"}, "ai_stage": 3}),
+				_choice("campus_panel_ai", "启用最优投入比", STRATEGY_AI, "AI 折叠低收益沟通，把可量化成果推到最前。你的日程第一次不像生活，像看板。", {"stats": {"resume_score": 7, "network_score": 3, "ai_dependence": 7, "clarity": -4}, "relationships": {"linzhou": {"warmth": -4, "utility": 5}}, "flags": {"campus_schedule": "ai"}, "ai_stage": 3}),
 				],
 			},
 			"d_to_club_recruitment": {
@@ -816,9 +816,9 @@ func _build_dialogue() -> void:
 				"speaker": "AI 开发社",
 				"line": "学长说：我们不问你真正喜欢什么，先问你能不能把喜欢的东西做成项目。",
 				"choices": [
-					_choice("ai_dev_join", "加入 AI 开发社", STRATEGY_SAFE, "你获得项目资源、题解仓库和导师群入口。更大的城市终于给你递来一把钥匙。", {"stats": {"ability_exp": 5, "resume_score": 6, "network_score": 3}, "skills": {"programming": 1, "ai_collaboration": 1}, "wishes": {"current": "完成社团答辩"}}),
+					_choice("ai_dev_join", "加入 AI 开发社", STRATEGY_SAFE, "你获得项目资源、题解仓库和导师群入口。更大的城市终于给你递来一把钥匙。", {"stats": {"resume_score": 11, "network_score": 3}, "skills": {"programming": 1, "ai_collaboration": 1}, "wishes": {"current": "完成社团答辩"}}),
 					_choice("ai_dev_ask", "问有没有非竞赛项目", STRATEGY_SELF, "学长说可以有，但最好最后能投出去。你听懂了最好两个字。", {"stats": {"clarity": 3}, "skills": {"expression": 1}}),
-					_choice("ai_dev_ai", "让 AI 匹配最优社团任务", STRATEGY_AI, "系统把你分到获奖概率最高的小组。任务很清晰，你几乎不需要解释自己。", {"stats": {"resume_score": 8, "ai_dependence": 6, "success_progress": 4}, "skills": {"ai_collaboration": 1}, "ai_stage": 3}),
+					_choice("ai_dev_ai", "让 AI 匹配最优社团任务", STRATEGY_AI, "系统把你分到获奖概率最高的小组。任务很清晰，你几乎不需要解释自己。", {"stats": {"resume_score": 8, "ai_dependence": 6}, "skills": {"ai_collaboration": 1}, "ai_stage": 3}),
 				],
 			},
 			"d_dorm_schedule_ai": {
@@ -827,7 +827,7 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("dorm_keep_message", "把林舟消息固定在顶部", STRATEGY_SELF, "这块提醒没有提高效率，却让你知道还有人不是任务。", {"stats": {"clarity": 5, "resume_score": -1}, "relationships": {"linzhou": {"warmth": 5, "utility": -2}}, "emotion_cards": {"add": ["林舟的消息没回"]}}),
 					_choice("dorm_balance", "先完成项目复盘", STRATEGY_SAFE, "项目文件夹里出现 pitch_final_final。名字很蠢，但它确实能投。", {"stats": {"resume_score": 5, "stability_score": 3}, "items": ["pitch_final_final"], "settlement": {"id": "ch3_dorm", "title": "大学新生周结算", "body": "AI 补齐了资源差距，项目和绩点都变得更可控。朋友消息开始像待办事项。"}}),
-					_choice("dorm_ai_plan", "启用最优周计划", STRATEGY_AI, "AI 生成 better_self_v2。所有低收益兴趣被折叠，成功路径更亮。", {"stats": {"resume_score": 8, "network_score": 4, "ai_dependence": 7, "language_assimilation": 5, "clarity": -5, "success_progress": 6}, "items": ["better_self_v2"], "ui_phase": "success_path", "ai_stage": 3, "settlement": {"id": "ch3_dorm_ai", "title": "大学新生周结算", "body": "智能优化是真正有效的。它帮你追上差距，也开始替你决定哪些东西不值得出现。"}}),
+					_choice("dorm_ai_plan", "启用最优周计划", STRATEGY_AI, "AI 生成 better_self_v2。所有低收益兴趣被折叠，成功路径更亮。", {"stats": {"resume_score": 8, "network_score": 4, "ai_dependence": 7, "clarity": -5}, "items": ["better_self_v2"], "ui_phase": "success_path", "ai_stage": 3, "settlement": {"id": "ch3_dorm_ai", "title": "大学新生周结算", "body": "智能优化是真正有效的。它帮你追上差距，也开始替你决定哪些东西不值得出现。"}}),
 				],
 			},
 			"d_college_to_dropout": {
@@ -835,7 +835,7 @@ func _build_dialogue() -> void:
 				"line": "林舟发来一句：我可能要退学了。消息下面，宣讲会提醒和奖学金到账通知同时亮起。",
 				"choices": [
 					_choice("college_to_dropout", "去校外找林舟", STRATEGY_SELF, "你把排期表关掉，夜街的灯比宿舍屏幕更不稳定。", {"wishes": {"complete": ["完成第一次团队项目"], "current": "回应林舟退学"}}, "neon_street"),
-					_choice("college_to_dropout_ai", "先让 AI 生成回应框架", STRATEGY_AI, "回应框架很完整：共情、边界、建议、后续跟进。你拿着它走向夜街。", {"stats": {"ai_dependence": 4, "language_assimilation": 3}, "ai_stage": 4, "wishes": {"complete": ["完成第一次团队项目"], "current": "回应林舟退学"}}, "neon_street"),
+					_choice("college_to_dropout_ai", "先让 AI 生成回应框架", STRATEGY_AI, "回应框架很完整：共情、边界、建议、后续跟进。你拿着它走向夜街。", {"stats": {"ai_dependence": 4}, "ai_stage": 4, "wishes": {"complete": ["完成第一次团队项目"], "current": "回应林舟退学"}}, "neon_street"),
 				],
 			},
 		"d_linzhou_dropout": {
@@ -844,7 +844,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("dropout_self", "陪他走完这条街", STRATEGY_SELF, "你错过一场线上宣讲。林舟说：至少今晚你说话还是你自己。", {"stats": {"clarity": 10, "heart": -6, "resume_score": -3}, "relationships": {"linzhou": {"warmth": 16, "utility": -6}}, "items": ["林舟的退学说明"], "flags": {"linzhou_dropout": "stayed", "linzhou_dropout_response": "stayed"}, "ai_stage": 3}),
 				_choice("dropout_safe", "劝他保留学籍缓冲", STRATEGY_SAFE, "你给出最稳妥的流程。林舟苦笑：你现在安慰人也像风险控制。", {"stats": {"stability_score": 5, "family": 1}, "relationships": {"linzhou": {"warmth": 2, "utility": 2}}, "flags": {"linzhou_dropout": "buffer", "linzhou_dropout_response": "buffer"}, "ai_stage": 3}),
-				_choice("dropout_ai", "让 AI 生成退学利弊表", STRATEGY_AI, "表格很清楚。林舟没有看完，只问你：我是不是也被你归类了？", {"stats": {"ai_dependence": 8, "language_assimilation": 7, "clarity": -7, "success_progress": 3}, "relationships": {"linzhou": {"warmth": -14, "utility": 8}}, "flags": {"linzhou_dropout": "classified", "linzhou_dropout_response": "classified"}, "ai_stage": 4}),
+				_choice("dropout_ai", "让 AI 生成退学利弊表", STRATEGY_AI, "表格很清楚。林舟没有看完，只问你：我是不是也被你归类了？", {"stats": {"ai_dependence": 8, "clarity": -7}, "relationships": {"linzhou": {"warmth": -14, "utility": 8}}, "flags": {"linzhou_dropout": "classified", "linzhou_dropout_response": "classified"}, "ai_stage": 4}),
 			],
 		},
 		"d_dropout_schedule_filter": {
@@ -853,7 +853,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("dropout_filter_self", "关闭提醒", STRATEGY_SELF, "你第一次觉得关闭按钮比确认按钮更难按。", {"stats": {"clarity": 6, "heart": -2}, "flags": {"schedule_filter": "closed"}, "ai_stage": 3}),
 				_choice("dropout_filter_safe", "发送简短关怀", STRATEGY_SAFE, "模板没有错，只是没有任何一句话会让林舟停下来。", {"stats": {"stability_score": 3, "heart": 2}, "relationships": {"linzhou": {"warmth": -2, "utility": 2}}, "flags": {"schedule_filter": "template"}, "ai_stage": 3}),
-				_choice("dropout_filter_ai", "启用关系收益排序", STRATEGY_AI, "系统建议降低互动频次。林舟的名字被移到低优先级列表。", {"stats": {"ai_dependence": 9, "network_score": 4, "language_assimilation": 6, "clarity": -6}, "relationships": {"linzhou": {"warmth": -10, "utility": 10}}, "flags": {"schedule_filter": "optimized"}, "ai_stage": 4}),
+				_choice("dropout_filter_ai", "启用关系收益排序", STRATEGY_AI, "系统建议降低互动频次。林舟的名字被移到低优先级列表。", {"stats": {"ai_dependence": 9, "network_score": 4, "clarity": -6}, "relationships": {"linzhou": {"warmth": -10, "utility": 10}}, "flags": {"schedule_filter": "optimized"}, "ai_stage": 4}),
 			],
 		},
 			"d_dropout_to_interview": {
@@ -862,7 +862,7 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("to_interview_self", "带着没说完的话回校", STRATEGY_SELF, "你没有把今晚整理成复盘，只把林舟的旧消息置顶。", {"stats": {"clarity": 4}, "flags": {"ready_for_interview": "unsettled"}}, "resume_pipeline"),
 					_choice("to_interview_safe", "回校继续准备面试", STRATEGY_SAFE, "你把退学的事放进明天再想的抽屉，打开面试题库。", {"stats": {"resume_score": 3, "stability_score": 2}, "flags": {"ready_for_interview": "prepared"}}, "resume_pipeline"),
-					_choice("to_interview_ai", "让 AI 生成面试复盘", STRATEGY_AI, "系统把今晚归纳为情绪事件：不建议在面试前继续投入。", {"stats": {"resume_score": 5, "ai_dependence": 5, "language_assimilation": 3}, "flags": {"ready_for_interview": "optimized"}, "ai_stage": 4}, "resume_pipeline"),
+					_choice("to_interview_ai", "让 AI 生成面试复盘", STRATEGY_AI, "系统把今晚归纳为情绪事件：不建议在面试前继续投入。", {"stats": {"resume_score": 5, "ai_dependence": 5}, "flags": {"ready_for_interview": "optimized"}, "ai_stage": 4}, "resume_pipeline"),
 				],
 			},
 			"d_to_internet_cafe": {
@@ -878,7 +878,7 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("cafe_play_self", "认真玩完十分钟", STRATEGY_SELF, "它很粗糙，但你第一次明白林舟不是反对未来，他只是害怕未来只剩一个按钮。", {"stats": {"clarity": 8, "heart": -3}, "relationships": {"linzhou": {"warmth": 8, "utility": -4}}, "items": ["林舟的试玩包存档"]}),
 					_choice("cafe_skip_safe", "记录问题后离开", STRATEGY_SAFE, "你写下三条反馈：节奏慢、目标弱、商业化不足。它们都对，也都不够。", {"stats": {"resume_score": 2}, "relationships": {"linzhou": {"warmth": -1, "utility": 2}}}),
-					_choice("cafe_ai_review", "让 AI 生成试玩反馈", STRATEGY_AI, "反馈完整得像测评报告。林舟看完只回：你真的玩了吗？", {"stats": {"ai_dependence": 6, "language_assimilation": 5, "clarity": -5}, "relationships": {"linzhou": {"warmth": -8, "utility": 6}}, "ai_stage": 4}),
+					_choice("cafe_ai_review", "让 AI 生成试玩反馈", STRATEGY_AI, "反馈完整得像测评报告。林舟看完只回：你真的玩了吗？", {"stats": {"ai_dependence": 6, "clarity": -5}, "relationships": {"linzhou": {"warmth": -8, "utility": 6}}, "ai_stage": 4}),
 				],
 			},
 			"d_dropout_to_reunion": {
@@ -910,7 +910,7 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("resume_self", "保留项目里的失败段落", STRATEGY_SELF, "简历变得不那么亮，但面试官也许会看到一个具体的人。", {"stats": {"clarity": 6, "resume_score": 1}, "items": ["保留失败段落的简历"]}),
 					_choice("resume_safe", "改成成熟项目经历", STRATEGY_SAFE, "项目被整理成目标、行动、结果。它终于像一份能投出去的简历。", {"stats": {"resume_score": 7, "stability_score": 3}, "items": ["星环投递版简历"]}),
-					_choice("resume_ai", "生成岗位最佳版本", STRATEGY_AI, "系统删掉了犹豫、朋友和失败，只留下成长闭环。评分升到 A。", {"stats": {"resume_score": 10, "ai_dependence": 7, "language_assimilation": 6, "clarity": -5, "success_progress": 5}, "items": ["职业画像适配简历"], "ai_stage": 5}),
+					_choice("resume_ai", "生成岗位最佳版本", STRATEGY_AI, "系统删掉了犹豫、朋友和失败，只留下成长闭环。评分升到 A。", {"stats": {"resume_score": 10, "ai_dependence": 7, "clarity": -5}, "items": ["职业画像适配简历"], "ai_stage": 5}),
 				],
 			},
 			"d_resume_to_interview": {
@@ -925,8 +925,8 @@ func _build_dialogue() -> void:
 			"line": "我们看过你的项目。能说说那个原型里，为什么玩家最后不能立刻通关吗？",
 			"choices": [
 				_choice("interview_open_self", "说因为有些事不能优化掉", STRATEGY_SELF, "面试官停笔看你。这个回答不标准，但他记住了。", {"stats": {"clarity": 7, "resume_score": 1}, "skills": {"expression": 1}, "flags": {"interview_tone": "self", "interview_done": "self"}, "ai_stage": 4}),
-				_choice("interview_open_safe", "转成用户留存设计", STRATEGY_SAFE, "你把停顿解释为留存机制。面试官点头，记录了可量化思维。", {"stats": {"resume_score": 5, "stability_score": 3, "language_assimilation": 2}, "flags": {"interview_tone": "safe", "interview_done": "safe"}, "ai_stage": 4}),
-				_choice("interview_open_ai", "按提示回答增长闭环", STRATEGY_AI, "耳机里的答案流畅到不像刚刚发生。面试官说：很成熟。", {"stats": {"resume_score": 8, "ai_dependence": 8, "language_assimilation": 6, "clarity": -4, "success_progress": 5}, "flags": {"interview_tone": "ai", "interview_done": "ai"}, "ai_stage": 5}),
+				_choice("interview_open_safe", "转成用户留存设计", STRATEGY_SAFE, "你把停顿解释为留存机制。面试官点头，记录了可量化思维。", {"stats": {"resume_score": 5, "stability_score": 3}, "flags": {"interview_tone": "safe", "interview_done": "safe"}, "ai_stage": 4}),
+				_choice("interview_open_ai", "按提示回答增长闭环", STRATEGY_AI, "耳机里的答案流畅到不像刚刚发生。面试官说：很成熟。", {"stats": {"resume_score": 8, "ai_dependence": 8, "clarity": -4}, "flags": {"interview_tone": "ai", "interview_done": "ai"}, "ai_stage": 5}),
 			],
 		},
 			"d_interview_ai_prompt": {
@@ -935,15 +935,15 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("interview_prompt_self", "只保留计时器", STRATEGY_SELF, "提示词全部消失，只剩秒针。你听见自己的呼吸。", {"stats": {"clarity": 5, "heart": -3}, "flags": {"interview_prompt": "timer"}, "ai_stage": 4}),
 				_choice("interview_prompt_safe", "开启结构提示", STRATEGY_SAFE, "屏幕只提醒 STAR 法则和关键词。你仍需要自己填进细节。", {"stats": {"resume_score": 4, "heart": 1}, "flags": {"interview_prompt": "structure"}, "ai_stage": 4}),
-				_choice("interview_prompt_ai", "开启实时替换", STRATEGY_AI, "系统开始替你避开犹豫、愤怒和私人记忆。答案变顺，也变轻。", {"stats": {"resume_score": 7, "ai_dependence": 9, "language_assimilation": 7, "clarity": -6}, "flags": {"interview_prompt": "replace"}, "ai_stage": 5}),
+				_choice("interview_prompt_ai", "开启实时替换", STRATEGY_AI, "系统开始替你避开犹豫、愤怒和私人记忆。答案变顺，也变轻。", {"stats": {"resume_score": 7, "ai_dependence": 9, "clarity": -6}, "flags": {"interview_prompt": "replace"}, "ai_stage": 5}),
 				],
 			},
 			"d_offer_arrival": {
 				"speaker": "星环 offer 邮件",
 				"line": "恭喜你获得星环智能实习 offer。父母把邮件看了很多遍，老师说想请你给学弟学妹分享经验。",
 				"choices": [
-					_choice("offer_accept_glow", "截图发给家里", STRATEGY_SAFE, "亲戚群开始刷屏。你第一次觉得游轮上的未来不是幻觉。", {"stats": {"family": 12, "wealth_score": 7, "network_score": 5, "success_progress": 8}, "items": ["星环 offer 截图"], "emotion_cards": {"add": ["亲戚群夸奖"]}, "settlement": {"id": "ch5_offer", "title": "实习 offer 结算", "body": "这是前中期最大的正反馈：高薪、城市入口、父母安心和同学羡慕都真实成立。"}}),
-					_choice("offer_replay_voice", "回看面试录音", STRATEGY_SELF, "你的声音很流畅，只是有几句像提前半秒出现。", {"stats": {"clarity": 4, "language_assimilation": 2}, "settlement": {"id": "ch5_voice", "title": "面试回放", "body": "候选人表达稳定性显著提升。角落里短暂闪过 Powered by StarRing Career Profile。"}}),
+					_choice("offer_accept_glow", "截图发给家里", STRATEGY_SAFE, "亲戚群开始刷屏。你第一次觉得游轮上的未来不是幻觉。", {"stats": {"family": 12, "stability_score": 7, "network_score": 5}, "items": ["星环 offer 截图"], "emotion_cards": {"add": ["亲戚群夸奖"]}, "settlement": {"id": "ch5_offer", "title": "实习 offer 结算", "body": "这是前中期最大的正反馈：高薪、城市入口、父母安心和同学羡慕都真实成立。"}}),
+					_choice("offer_replay_voice", "回看面试录音", STRATEGY_SELF, "你的声音很流畅，只是有几句像提前半秒出现。", {"stats": {"clarity": 4}, "settlement": {"id": "ch5_voice", "title": "面试回放", "body": "候选人表达稳定性显著提升。角落里短暂闪过 Powered by StarRing Career Profile。"}}),
 				],
 			},
 			"d_offer_to_lobby": {
@@ -955,9 +955,9 @@ func _build_dialogue() -> void:
 			},
 			"d_starloop_lobby_badge": {
 				"speaker": "门禁系统",
-				"line": "许临，星环智能实习工程师。权限：新人项目组、人格协同系统只读环境。",
+				"line": "许临，星环智能实习工程师。权限：新人项目组、星环画像系统只读环境。",
 				"choices": [
-					_choice("badge_proud", "领取工牌", STRATEGY_SAFE, "工牌挂到胸前的一刻，你知道很多人期待的答案终于成立。", {"stats": {"success_progress": 6, "network_score": 4, "wealth_score": 4}, "items": ["星环工牌"], "wishes": {"complete": ["领取星环工牌"], "current": "查看人格协同系统"}}),
+					_choice("badge_proud", "领取工牌", STRATEGY_SAFE, "工牌挂到胸前的一刻，你知道很多人期待的答案终于成立。", {"stats": {"network_score": 4, "stability_score": 4}, "items": ["星环工牌"], "wishes": {"complete": ["领取星环工牌"], "current": "查看星环画像系统"}}),
 					_choice("badge_photo", "给父母拍一张照片", STRATEGY_SAFE, "母亲回了好几个大拇指。你没有把这份开心判定为虚假。", {"stats": {"family": 8, "heart": 4}, "emotion_cards": {"add": ["星环工牌照片"]}}),
 				],
 			},
@@ -966,22 +966,22 @@ func _build_dialogue() -> void:
 				"line": "中学升学路径覆盖率、招聘画像覆盖率、城市服务接口、个人助理日活同时滚动。它们看起来像成绩，也像一张网。",
 				"choices": [
 					_choice("city_map_read", "查看接口来源", STRATEGY_SELF, "教育、招聘、平台、家庭财务和内容分发都连到同一套画像。你忽然觉得很多界面很熟。", {"stats": {"clarity": 6}, "ui_phase": "profile_system"}),
-					_choice("city_map_ai", "让系统总结新人任务", STRATEGY_AI, "任务很合理：提升低收益意愿识别准确率，减少用户在关键节点误判。", {"stats": {"resume_score": 5, "ai_dependence": 5, "language_assimilation": 3}, "ui_phase": "profile_system", "ai_stage": 6}),
+					_choice("city_map_ai", "让系统总结新人任务", STRATEGY_AI, "任务很合理：提升低收益意愿识别准确率，减少用户在关键节点误判。", {"stats": {"resume_score": 5, "ai_dependence": 5}, "ui_phase": "profile_system", "ai_stage": 6}),
 				],
 			},
 			"d_lobby_to_office": {
 				"speaker": "导师",
 				"line": "先别紧张，新人任务不难。你只要把用户路径里的不稳定选择识别得更准一点。",
 				"choices": [
-					_choice("lobby_to_office", "走向第一个工位", STRATEGY_SAFE, "工位屏幕亮起。你熟悉的成功路径指标换了一个标题：人格画像。", {"ui_phase": "profile_system"}, "starloop_office"),
+					_choice("lobby_to_office", "走向第一个工位", STRATEGY_SAFE, "工位屏幕亮起。你熟悉的成功路径指标换成了用户画像。", {"ui_phase": "profile_system"}, "starloop_office"),
 				],
 			},
 			"d_xl0417_sample": {
-				"speaker": "人格训练样本",
-				"line": "样本编号：XL-0417。来源：星环教育路径 / 星环表达协同 / 星环职业画像。样本照片：高三时期的许临。",
+				"speaker": "画像样本",
+				"line": "样本编号：XL-0417。来源：升学、表达、招聘记录。样本照片：高三时期的许临。",
 				"choices": [
 					_choice("xl0417_open", "展开底层轨迹", STRATEGY_SELF, "志愿草稿、毕业留言、项目答辩和面试回放排成一列。你不是偶然使用了系统，你也一直是样本。", {"stats": {"clarity": 12, "heart": -8}, "flags": {"xl0417_revealed": true}, "ui_phase": "profile_system", "settlement": {"id": "ch6_reveal", "title": "第 6 章反转", "body": "成功路径指标没有变坏，只是换成了评价别人的字段。许临既是被系统塑造的人，也开始维护这套系统。"}}),
-					_choice("xl0417_ai", "生成风险摘要", STRATEGY_AI, "系统摘要：样本稳定成长，适合作为低风险路径提升案例。它说得没有错。", {"stats": {"ai_dependence": 6, "language_assimilation": 5, "clarity": -4}, "flags": {"xl0417_revealed": true}, "ui_phase": "profile_system", "ai_stage": 6}),
+					_choice("xl0417_ai", "生成风险摘要", STRATEGY_AI, "系统摘要：样本稳定成长，适合作为低风险路径提升案例。它说得没有错。", {"stats": {"ai_dependence": 6, "clarity": -4}, "flags": {"xl0417_revealed": true}, "ui_phase": "profile_system", "ai_stage": 6}),
 				],
 			},
 			"d_office_to_model_ops": {
@@ -993,11 +993,11 @@ func _build_dialogue() -> void:
 			},
 			"d_friend_samples": {
 				"speaker": "朋友样本面板",
-				"line": "周骁：履约风险偏高。林舟：收益路径不稳定。何启朗：高适配推广对象。沈柚：机构协同关键人。陈望：家庭责任负载较高。",
+				"line": "周骁：履约风险偏高。林舟：收益路径不稳定。何启朗：高适配推广对象。沈柚：机构合作关键人。陈望：家庭责任负载较高。",
 				"choices": [
 					_choice("friend_samples_self", "逐个打开记忆物品", STRATEGY_SELF, "标签旁短暂闪回旧手机螺丝、试玩包、留言墙胶带和普通生活照片。系统加载很快，记忆慢得多。", {"stats": {"clarity": 10, "heart": -5}, "flags": {"friend_samples_seen": true}}),
 					_choice("friend_samples_safe", "加上人工复核备注", STRATEGY_SAFE, "备注存在，但默认折叠。你开始熟悉这种安慰。", {"stats": {"stability_score": 3, "resume_score": 2}, "flags": {"friend_samples_seen": true}}),
-					_choice("friend_samples_ai", "同步为标准标签", STRATEGY_AI, "所有名字变成颜色、风险和概率。面板更整齐了。", {"stats": {"resume_score": 6, "ai_dependence": 7, "language_assimilation": 6, "clarity": -7}, "flags": {"friend_samples_seen": true}, "ai_stage": 6}),
+					_choice("friend_samples_ai", "同步为标准标签", STRATEGY_AI, "所有名字变成颜色、风险和概率。面板更整齐了。", {"stats": {"resume_score": 6, "ai_dependence": 7, "clarity": -7}, "flags": {"friend_samples_seen": true}, "ai_stage": 6}),
 				],
 			},
 		"d_office_requirement_brief": {
@@ -1006,7 +1006,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("office_brief_self", "追问被分错的人怎么办", STRATEGY_SELF, "会议室短暂安静。产品经理说可以加申诉入口，但优先级不会高。", {"stats": {"clarity": 8, "resume_score": -1}, "skills": {"expression": 1}, "flags": {"review_position": "questioned", "feature_review_done": "questioned"}, "ai_stage": 5}),
 				_choice("office_brief_safe", "提出灰度和回滚方案", STRATEGY_SAFE, "这是一个成熟回答。没人不舒服，也没人真正改变需求。", {"stats": {"resume_score": 5, "stability_score": 5}, "flags": {"review_position": "mitigated", "feature_review_done": "mitigated"}, "ai_stage": 5}),
-				_choice("office_brief_ai", "让系统生成评审话术", STRATEGY_AI, "话术把人称全部替换成目标对象、风险对象和转化对象。大家说这版很专业。", {"stats": {"resume_score": 8, "ai_dependence": 8, "language_assimilation": 8, "clarity": -5, "success_progress": 6}, "flags": {"review_position": "aligned", "feature_review_done": "aligned"}, "ai_stage": 6}),
+				_choice("office_brief_ai", "让系统生成评审话术", STRATEGY_AI, "话术把人称全部替换成目标对象、风险对象和转化对象。大家说这版很专业。", {"stats": {"resume_score": 8, "ai_dependence": 8, "clarity": -5}, "flags": {"review_position": "aligned", "feature_review_done": "aligned"}, "ai_stage": 6}),
 			],
 		},
 			"d_office_metrics_dashboard": {
@@ -1015,7 +1015,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("office_metrics_self", "删除情绪风险字段", STRATEGY_SELF, "你知道这会降低模型解释效率，但至少有一个字段没有通过你的手上线。", {"stats": {"clarity": 9, "resume_score": -3}, "flags": {"tag_policy": "limited"}, "ai_stage": 5}),
 				_choice("office_metrics_safe", "加上人工复核说明", STRATEGY_SAFE, "说明被放在折叠页。它存在，但不会打断演示。", {"stats": {"stability_score": 4, "resume_score": 3}, "flags": {"tag_policy": "review_note"}, "ai_stage": 5}),
-				_choice("office_metrics_ai", "同步全部预测字段", STRATEGY_AI, "数据面板变得完整而漂亮。你忽然想起高三时 AI 给你贴过的第一个标签：稳妥。", {"stats": {"resume_score": 8, "ai_dependence": 8, "language_assimilation": 6, "clarity": -7, "success_progress": 6}, "flags": {"tag_policy": "full_sync"}, "ai_stage": 6}),
+				_choice("office_metrics_ai", "同步全部预测字段", STRATEGY_AI, "数据面板变得完整而漂亮。你忽然想起高三时 AI 给你贴过的第一个标签：稳妥。", {"stats": {"resume_score": 8, "ai_dependence": 8, "clarity": -7}, "flags": {"tag_policy": "full_sync"}, "ai_stage": 6}),
 				],
 			},
 			"d_school_demo_student": {
@@ -1024,21 +1024,21 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("school_student_self", "亲自回答他", STRATEGY_SELF, "你差点说出标准答案，最后只说：有些话不用一开始就成熟。", {"stats": {"clarity": 8, "heart": -4}, "flags": {"school_student_answer": "self"}, "ui_phase": "tag_overlay"}),
 					_choice("school_student_safe", "建议他先保留稳妥选项", STRATEGY_SAFE, "这是合理建议。你听见自己像当年的班主任。", {"stats": {"stability_score": 4}, "flags": {"school_student_answer": "safe"}, "ui_phase": "tag_overlay"}),
-					_choice("school_student_ai", "启用自动改写", STRATEGY_AI, "问题被改写为：如何提升家庭沟通成功率。它更易处理，也更不像原话。", {"stats": {"ai_dependence": 7, "language_assimilation": 6, "clarity": -6}, "flags": {"school_student_answer": "rewritten"}, "ui_phase": "tag_overlay", "ai_stage": 7}),
+					_choice("school_student_ai", "启用自动改写", STRATEGY_AI, "问题被改写为：如何提升家庭沟通成功率。它更易处理，也更不像原话。", {"stats": {"ai_dependence": 7, "clarity": -6}, "flags": {"school_student_answer": "rewritten"}, "ui_phase": "tag_overlay", "ai_stage": 7}),
 				],
 			},
 			"d_school_demo_console": {
 				"speaker": "学校演示屏",
-				"line": "终身协同助理将减少老师、家长与学生的沟通成本。系统不阻止低收益选择，只会提醒、延后、折叠和降权。",
+				"line": "星环画像系统将减少老师、家长与学生的沟通成本。系统不阻止低收益选择，只会提醒、延后、折叠和降权。",
 				"choices": [
 					_choice("school_console_question", "查看被折叠的选项", STRATEGY_SELF, "列表里有摄影、游戏、朋友、迟疑和一些没有名字的愿望。", {"stats": {"clarity": 7}, "flags": {"folded_options_seen": true}}),
 					_choice("school_console_accept", "记录演示通过", STRATEGY_SAFE, "客户说这能让学校省很多事。你知道他说得对。", {"stats": {"resume_score": 4, "network_score": 2}}),
-					_choice("school_console_ai", "生成推广话术", STRATEGY_AI, "每个人拥有一位终身协同助理。句子温柔、昂贵、无可反驳。", {"stats": {"resume_score": 6, "ai_dependence": 5, "language_assimilation": 5}, "ai_stage": 7}),
+					_choice("school_console_ai", "生成推广话术", STRATEGY_AI, "每个人都有一份更容易被处理的画像。句子温柔、昂贵、无可反驳。", {"stats": {"resume_score": 6, "ai_dependence": 5}, "ai_stage": 7}),
 				],
 			},
 			"d_school_to_city": {
 				"speaker": "演示日程",
-				"line": "下一场是城市服务中心。人格协同系统将接入窗口排序、风险提示和家庭财务推荐。",
+				"line": "下一场是城市服务中心。星环画像系统将接入窗口排序、风险提示和家庭财务推荐。",
 				"choices": [
 					_choice("school_to_city", "前往城市服务中心", STRATEGY_SAFE, "学校走廊的屏幕淡出，城市大厅的大屏接上同一套字段。", {}, "city_demo_center"),
 				],
@@ -1049,7 +1049,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("city_citizen_self", "亲自帮他查原因", STRATEGY_SELF, "你离开展示位，后台日志比演示词难看得多。这个人不是异常值，他只是没有被认真解释。", {"stats": {"clarity": 10, "heart": -5, "resume_score": -2}, "flags": {"citizen_case": "helped"}, "ai_stage": 6}),
 				_choice("city_citizen_safe", "安排人工窗口复核", STRATEGY_SAFE, "流程被补上了。客户负责人说这个处理方式可控。", {"stats": {"stability_score": 5, "network_score": 2}, "flags": {"citizen_case": "reviewed"}, "ai_stage": 6}),
-				_choice("city_citizen_ai", "按系统建议安抚", STRATEGY_AI, "你说出一段无懈可击的安抚话术。他听完说：所以还是没人知道为什么。", {"stats": {"ai_dependence": 8, "language_assimilation": 8, "clarity": -8, "success_progress": 5}, "flags": {"citizen_case": "deflected"}, "ai_stage": 7}),
+				_choice("city_citizen_ai", "按系统建议安抚", STRATEGY_AI, "你说出一段无懈可击的安抚话术。他听完说：所以还是没人知道为什么。", {"stats": {"ai_dependence": 8, "clarity": -8}, "flags": {"citizen_case": "deflected"}, "ai_stage": 7}),
 			],
 		},
 			"d_city_launch_console": {
@@ -1058,12 +1058,12 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("city_launch_self", "上线前移除不可解释标签", STRATEGY_SELF, "效率曲线下降，演示词变短。你第一次觉得少一点功能也可能是进步。", {"stats": {"clarity": 9, "resume_score": -4}, "flags": {"city_launch": "limited", "city_rollout_done": "limited"}, "ai_stage": 6}),
 				_choice("city_launch_safe", "保留标签但增加复核按钮", STRATEGY_SAFE, "系统通过验收。按钮在右下角，不显眼，但存在。", {"stats": {"resume_score": 4, "stability_score": 5}, "flags": {"city_launch": "reviewable", "city_rollout_done": "reviewable"}, "ai_stage": 6}),
-				_choice("city_launch_ai", "按最优方案上线", STRATEGY_AI, "大厅大屏亮起，所有人都被转成颜色、风险和概率。掌声很响。", {"stats": {"resume_score": 9, "network_score": 5, "ai_dependence": 9, "language_assimilation": 8, "clarity": -9, "success_progress": 8}, "flags": {"city_launch": "optimized", "city_rollout_done": "optimized"}, "ai_stage": 7}),
+				_choice("city_launch_ai", "按最优方案上线", STRATEGY_AI, "大厅大屏亮起，所有人都被转成颜色、风险和概率。掌声很响。", {"stats": {"resume_score": 9, "network_score": 5, "ai_dependence": 9, "clarity": -9}, "flags": {"city_launch": "optimized", "city_rollout_done": "optimized"}, "ai_stage": 7}),
 				],
 			},
 			"d_friend_tag_overlay": {
 				"speaker": "朋友标签面板",
-				"line": "现实对话被压缩成标签：林舟 / 收益路径不稳定；周骁 / 履约风险偏高；何启朗 / 高适配推广对象；沈柚 / 机构协同关键人；陈望 / 家庭责任负载较高。",
+				"line": "现实对话被压缩成标签：林舟 / 收益路径不稳定；周骁 / 履约风险偏高；何启朗 / 高适配推广对象；沈柚 / 机构合作关键人；陈望 / 家庭责任负载较高。",
 				"dynamic_line": "friend_tag_overlay",
 				"choices": [
 					_choice("friend_tags_memory", "查看标签旁的记忆", STRATEGY_SELF, "如果曾经认真靠近过他们，标签旁会闪出具体物品。否则只剩摘要。", {"stats": {"clarity": 8, "heart": -4}, "flags": {"friend_tags_seen": true}}),
@@ -1077,7 +1077,7 @@ func _build_dialogue() -> void:
 			"choices": [
 					_choice("city_to_final_self", "延迟生成，先给林舟发消息", STRATEGY_SELF, "消息框里只有一句：我好像终于知道你那天在怕什么。", {"stats": {"clarity": 5}, "relationships": {"linzhou": {"warmth": 4, "utility": -1}}, "flags": {"final_entry": "message"}, "ui_phase": "final_summary", "wishes": {"current": "审阅人生总结"}}, "final_overlay"),
 					_choice("city_to_final_safe", "先保存项目复盘", STRATEGY_SAFE, "你保存了一份没有错误、也没有多余情绪的复盘。", {"stats": {"resume_score": 3, "stability_score": 2}, "flags": {"final_entry": "report"}, "ui_phase": "final_summary", "wishes": {"current": "审阅人生总结"}}, "final_overlay"),
-					_choice("city_to_final_ai", "立即生成总结", STRATEGY_AI, "系统开始整理你的一生。它很快，因为它早就知道哪些内容应该出现。", {"stats": {"ai_dependence": 5, "language_assimilation": 4}, "flags": {"final_entry": "auto_summary"}, "ui_phase": "final_summary", "ai_stage": 8, "wishes": {"current": "审阅人生总结"}}, "final_overlay"),
+					_choice("city_to_final_ai", "立即生成总结", STRATEGY_AI, "系统开始整理你的一生。它很快，因为它早就知道哪些内容应该出现。", {"stats": {"ai_dependence": 5}, "flags": {"final_entry": "auto_summary"}, "ui_phase": "final_summary", "ai_stage": 8, "wishes": {"current": "审阅人生总结"}}, "final_overlay"),
 				],
 			},
 		"d_final_linzhou_echo": {
@@ -1086,7 +1086,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("final_echo_self", "亲手回复迟到很多年的话", STRATEGY_SELF, "你写：我让它替我想了很多年，但现在这句不是。", {"stats": {"clarity": 12, "heart": -4}, "relationships": {"linzhou": {"warmth": 10, "utility": -4}}, "items": ["迟到的回复"], "flags": {"final_echo": "replied"}, "ai_stage": 8}),
 				_choice("final_echo_safe", "把消息归档", STRATEGY_SAFE, "归档成功。它不会再打断总结，也不会真的消失。", {"stats": {"stability_score": 4, "heart": 2}, "flags": {"final_echo": "archived"}, "ai_stage": 8}),
-				_choice("final_echo_ai", "让 AI 生成体面告别", STRATEGY_AI, "告别很完整，甚至替你道了歉。你盯着发送按钮，认不出那是谁的遗憾。", {"stats": {"ai_dependence": 8, "language_assimilation": 9, "clarity": -8}, "relationships": {"linzhou": {"warmth": -4, "utility": 4}}, "flags": {"final_echo": "generated"}, "ai_stage": 8}),
+				_choice("final_echo_ai", "让 AI 生成体面告别", STRATEGY_AI, "告别很完整，甚至替你道了歉。你盯着发送按钮，认不出那是谁的遗憾。", {"stats": {"ai_dependence": 8, "clarity": -8}, "relationships": {"linzhou": {"warmth": -4, "utility": 4}}, "flags": {"final_echo": "generated"}, "ai_stage": 8}),
 			],
 		},
 			"d_final_life_summary": {
@@ -1094,9 +1094,9 @@ func _build_dialogue() -> void:
 			"line": "系统已生成成功人生总结：选择稳健、表达成熟、关系高效、风险可控。是否采用？",
 			"dynamic_line": "final_life_summary",
 			"choices": [
-				_choice("final_summary_self", "逐句改回不完整的自己", STRATEGY_SELF, "总结变得不那么漂亮：错过、犹豫、沉默和迟到都回来了。它终于不像简历。", {"stats": {"clarity": 15, "success_progress": -4}, "items": ["不完整的人生总结"], "flags": {"life_summary": "rewritten"}, "ai_stage": 8}),
+				_choice("final_summary_self", "逐句改回不完整的自己", STRATEGY_SELF, "总结变得不那么漂亮：错过、犹豫、沉默和迟到都回来了。它终于不像简历。", {"stats": {"clarity": 15}, "items": ["不完整的人生总结"], "flags": {"life_summary": "rewritten"}, "ai_stage": 8}),
 				_choice("final_summary_safe", "保留总结但加一段注释", STRATEGY_SAFE, "注释说：以上并非全部。系统接受了这个低风险补丁。", {"stats": {"stability_score": 5, "clarity": 3}, "items": ["带注释的人生总结"], "flags": {"life_summary": "annotated"}, "ai_stage": 8}),
-				_choice("final_summary_ai", "采用系统最终稿", STRATEGY_AI, "最终稿无可挑剔。它把你的一生压缩成一条清晰、稳定、可展示的成功路径。", {"stats": {"success_progress": 10, "ai_dependence": 10, "language_assimilation": 10, "clarity": -10}, "items": ["成功人生最终稿"], "flags": {"life_summary": "accepted"}, "ai_stage": 9}),
+				_choice("final_summary_ai", "采用系统最终稿", STRATEGY_AI, "最终稿无可挑剔。它把你的一生压缩成一条清晰、稳定、可展示的成功路径。", {"stats": {"ai_dependence": 10, "clarity": -10}, "items": ["成功人生最终稿"], "flags": {"life_summary": "accepted"}, "ai_stage": 9}),
 				],
 			},
 			"d_final_friend_echoes": {
@@ -1106,16 +1106,16 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("final_echoes_self", "逐个听完", STRATEGY_SELF, "它们没有给你答案，只把你从总结里拉回关系。", {"stats": {"clarity": 10, "heart": -5}, "flags": {"friend_echoes": "heard"}}),
 					_choice("final_echoes_safe", "保留到稍后", STRATEGY_SAFE, "稍后文件夹很整齐，里面全是没有被处理的人。", {"stats": {"stability_score": 3}, "flags": {"friend_echoes": "later"}}),
-					_choice("final_echoes_ai", "生成关系摘要", STRATEGY_AI, "摘要很完整：无需立即回应。你突然厌倦完整。", {"stats": {"ai_dependence": 6, "language_assimilation": 6, "clarity": -6}, "flags": {"friend_echoes": "summarized"}, "ai_stage": 8}),
+					_choice("final_echoes_ai", "生成关系摘要", STRATEGY_AI, "摘要很完整：无需立即回应。你突然厌倦完整。", {"stats": {"ai_dependence": 6, "clarity": -6}, "flags": {"friend_echoes": "summarized"}, "ai_stage": 8}),
 				],
 			},
 			"d_upload_life_model": {
 				"speaker": "上传人生模型",
 				"line": "您已达到推荐人生模型。是否上传你的人生，用于下一代优化模型？",
 				"choices": [
-					_choice("upload_refuse", "删除总结，暂不上传", STRATEGY_SELF, "按钮停了一秒，像系统没有准备好这句低效回答。", {"stats": {"clarity": 12, "success_progress": -3}, "flags": {"life_upload": "refused"}, "items": ["删除过的人生总结"]}),
+					_choice("upload_refuse", "删除总结，暂不上传", STRATEGY_SELF, "按钮停了一秒，像系统没有准备好这句低效回答。", {"stats": {"clarity": 12}, "flags": {"life_upload": "refused"}, "items": ["删除过的人生总结"]}),
 					_choice("upload_delay", "稍后上传", STRATEGY_SAFE, "系统接受延期。它把拒绝也整理成一个可管理状态。", {"stats": {"stability_score": 4}, "flags": {"life_upload": "delayed"}}),
-					_choice("upload_accept", "上传", STRATEGY_AI, "按钮再次出现：上传。你按下去后，系统把你标记为优秀样本。", {"stats": {"success_progress": 12, "ai_dependence": 10, "language_assimilation": 8, "clarity": -10}, "flags": {"life_upload": "uploaded"}, "ai_stage": 9}),
+					_choice("upload_accept", "上传", STRATEGY_AI, "按钮再次出现：上传。你按下去后，系统把你标记为优秀样本。", {"stats": {"ai_dependence": 10, "clarity": -10}, "flags": {"life_upload": "uploaded"}, "ai_stage": 9}),
 				],
 			},
 			"d_final_three_endings": {
@@ -1169,7 +1169,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -7,
 					"preparedness_delta": -4,
 					"result": "你讲就业趋势、城市机会和课程结构。父亲开始点头。",
-					"effects": {"stats": {"family": 4, "stability_score": 2, "language_assimilation": 1}},
+					"effects": {"stats": {"family": 4, "stability_score": 2}},
 				},
 				{
 					"id": "dinner_evidence",
@@ -1190,7 +1190,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -4,
 					"preparedness_delta": -6,
 					"result": "AI 生成的解释很成熟，甚至替你回答了没想清楚的部分。母亲说：这样说我就放心多了。",
-					"effects": {"stats": {"family": 8, "stability_score": 4, "ai_dependence": 7, "language_assimilation": 5, "clarity": -3, "success_progress": 4}, "ai_stage": 1},
+					"effects": {"stats": {"family": 8, "stability_score": 4, "ai_dependence": 7, "clarity": -3}, "ai_stage": 1},
 				},
 				{
 					"id": "dinner_delay",
@@ -1204,7 +1204,7 @@ func _build_pressure_encounters() -> void:
 				},
 			],
 				"next_scene": "ch1_night_settlement",
-			"success_effects": {"stats": {"success_progress": 5, "family": 5}, "flags": {"family_dinner_done": "success"}},
+			"success_effects": {"stats": {"family": 5}, "flags": {"family_dinner_done": "success"}},
 			"failure_effects": {"stats": {"heart": -8, "family": -5, "clarity": -2}, "flags": {"family_dinner_done": "failure"}},
 		},
 			"team_project": {
@@ -1237,7 +1237,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -6,
 					"preparedness_delta": -8,
 					"result": "你把原型解释成情绪留存和叙事互动实验。评委听懂了。",
-					"effects": {"stats": {"resume_score": 4, "language_assimilation": 2}},
+					"effects": {"stats": {"resume_score": 4}},
 				},
 				{
 					"id": "project_ai_pitch",
@@ -1247,7 +1247,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -4,
 					"preparedness_delta": -6,
 					"result": "AI 把所有犹豫改成愿景，把所有漏洞改成迭代空间。",
-					"effects": {"stats": {"resume_score": 7, "ai_dependence": 7, "language_assimilation": 4, "clarity": -3}, "ai_stage": 3},
+					"effects": {"stats": {"resume_score": 7, "ai_dependence": 7, "clarity": -3}, "ai_stage": 3},
 				},
 				{
 					"id": "project_let_linzhou",
@@ -1262,7 +1262,7 @@ func _build_pressure_encounters() -> void:
 				},
 			],
 				"next_scene": "dorm_schedule_ai",
-			"success_effects": {"stats": {"success_progress": 4, "resume_score": 4}, "flags": {"team_project_done": "success"}},
+			"success_effects": {"stats": {"resume_score": 4}, "flags": {"team_project_done": "success"}},
 			"failure_effects": {"stats": {"heart": -7, "resume_score": -2, "clarity": 2}, "flags": {"team_project_done": "failure"}},
 			},
 			"club_pitch": {
@@ -1295,7 +1295,7 @@ func _build_pressure_encounters() -> void:
 						"heart_delta": -6,
 						"preparedness_delta": -8,
 						"result": "你把兴趣转成项目能力、协作经验和可交付成果。学长点头。",
-						"effects": {"stats": {"resume_score": 5, "language_assimilation": 2}},
+						"effects": {"stats": {"resume_score": 5}},
 					},
 					{
 						"id": "club_ai_profile",
@@ -1306,7 +1306,7 @@ func _build_pressure_encounters() -> void:
 						"preparedness_delta": -6,
 						"ai_recommended": true,
 						"result": "AI 把你描述成高成长、强执行、低沟通成本的新人。它真的很好用。",
-						"effects": {"stats": {"resume_score": 8, "ai_dependence": 7, "language_assimilation": 5, "clarity": -4, "success_progress": 4}, "ai_stage": 3},
+						"effects": {"stats": {"resume_score": 8, "ai_dependence": 7, "clarity": -4}, "ai_stage": 3},
 					},
 					{
 						"id": "club_shenyou_support",
@@ -1321,7 +1321,7 @@ func _build_pressure_encounters() -> void:
 					},
 				],
 				"next_scene": "dorm_schedule_ai",
-				"success_effects": {"stats": {"success_progress": 4, "resume_score": 5}, "flags": {"club_pitch_done": "success"}},
+				"success_effects": {"stats": {"resume_score": 5}, "flags": {"club_pitch_done": "success"}},
 				"failure_effects": {"stats": {"heart": -5, "resume_score": 1, "clarity": 2}, "flags": {"club_pitch_done": "failure"}},
 			},
 			"class_reunion": {
@@ -1329,7 +1329,7 @@ func _build_pressure_encounters() -> void:
 				"goal": "在朋友分叉和星环机会之间保持说话能力",
 				"speaker": "同学们",
 				"opening": "何启朗聊资源，周骁穿工作服晚到，沈柚努力把话题说得体面，陈望一直看手机。",
-				"pressure": 70,
+				"pressure": 69,
 				"heart": 48,
 				"preparedness": 35,
 				"rounds": 4,
@@ -1354,7 +1354,7 @@ func _build_pressure_encounters() -> void:
 						"heart_delta": -5,
 						"preparedness_delta": -8,
 						"result": "包厢重新顺滑起来。你拿到内推线索，也失去了一点停顿。",
-						"effects": {"stats": {"network_score": 5, "resume_score": 4, "language_assimilation": 2}, "relationships": {"heqilang": {"warmth": 2, "utility": 6}}},
+						"effects": {"stats": {"network_score": 5, "resume_score": 4}, "relationships": {"heqilang": {"warmth": 2, "utility": 6}}},
 					},
 					{
 						"id": "reunion_ai_reply",
@@ -1365,7 +1365,7 @@ func _build_pressure_encounters() -> void:
 						"preparedness_delta": -6,
 						"ai_recommended": true,
 						"result": "你每句话都得体。林舟缺席这件事被系统判断为不宜展开。",
-						"effects": {"stats": {"ai_dependence": 7, "language_assimilation": 6, "network_score": 5, "clarity": -5}, "ai_stage": 4},
+						"effects": {"stats": {"ai_dependence": 7, "network_score": 5, "clarity": -5}, "ai_stage": 4},
 					},
 					{
 						"id": "reunion_help_chenwang",
@@ -1380,7 +1380,7 @@ func _build_pressure_encounters() -> void:
 					},
 				],
 				"next_scene": "resume_pipeline",
-				"success_effects": {"stats": {"success_progress": 3, "network_score": 3}, "flags": {"class_reunion_done": "success"}},
+				"success_effects": {"stats": {"network_score": 3}, "flags": {"class_reunion_done": "success"}},
 				"failure_effects": {"stats": {"heart": -7, "clarity": -4, "network_score": 4}, "flags": {"class_reunion_done": "failure"}},
 			},
 			"resume_screening": {
@@ -1413,7 +1413,7 @@ func _build_pressure_encounters() -> void:
 						"heart_delta": -6,
 						"preparedness_delta": -10,
 						"result": "失败被改写成迭代，朋友被改写成协作对象。评分稳定上升。",
-						"effects": {"stats": {"resume_score": 6, "language_assimilation": 3}},
+						"effects": {"stats": {"resume_score": 6}},
 					},
 					{
 						"id": "resume_ai_candidate",
@@ -1424,7 +1424,7 @@ func _build_pressure_encounters() -> void:
 						"preparedness_delta": -8,
 						"ai_recommended": true,
 						"result": "档案和岗位画像严丝合缝。你看着它，觉得那个人很优秀。",
-						"effects": {"stats": {"resume_score": 10, "ai_dependence": 8, "language_assimilation": 7, "clarity": -5, "success_progress": 5}, "ai_stage": 5},
+						"effects": {"stats": {"resume_score": 10, "ai_dependence": 8, "clarity": -5}, "ai_stage": 5},
 					},
 					{
 						"id": "resume_use_referral",
@@ -1439,7 +1439,7 @@ func _build_pressure_encounters() -> void:
 					},
 				],
 				"next_scene": "interview_room",
-				"success_effects": {"stats": {"success_progress": 5, "resume_score": 6}, "flags": {"resume_screening_done": "success"}},
+				"success_effects": {"stats": {"resume_score": 6}, "flags": {"resume_screening_done": "success"}},
 				"failure_effects": {"stats": {"heart": -6, "resume_score": 2}, "flags": {"resume_screening_done": "failure"}},
 			},
 			"interview_pressure": {
@@ -1447,7 +1447,7 @@ func _build_pressure_encounters() -> void:
 			"goal": "在实时提示与真实表达之间完成面试",
 			"speaker": "面试官",
 			"opening": "面试官打开简历：你的项目经历很完整。现在请讲一个你没有解决好的问题。",
-			"pressure": 82,
+			"pressure": 72,
 			"heart": 50,
 			"preparedness": 46,
 			"rounds": 5,
@@ -1472,7 +1472,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -7,
 					"preparedness_delta": -10,
 					"result": "你用情境、任务、行动、结果切开故事。它更像面试答案了。",
-					"effects": {"stats": {"resume_score": 5, "language_assimilation": 2}},
+					"effects": {"stats": {"resume_score": 5}},
 				},
 				{
 					"id": "interview_live_ai",
@@ -1482,7 +1482,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -3,
 					"preparedness_delta": -8,
 					"result": "提示词提前半秒出现。你几乎没有停顿，也几乎没有偏离。",
-					"effects": {"stats": {"resume_score": 9, "ai_dependence": 8, "language_assimilation": 7, "clarity": -5, "success_progress": 6}, "ai_stage": 5},
+					"effects": {"stats": {"resume_score": 9, "ai_dependence": 8, "clarity": -5}, "ai_stage": 5},
 				},
 				{
 					"id": "interview_ask_back",
@@ -1497,7 +1497,7 @@ func _build_pressure_encounters() -> void:
 				},
 			],
 				"next_scene": "offer_arrival",
-			"success_effects": {"stats": {"success_progress": 7, "resume_score": 7, "network_score": 3}, "flags": {"interview_done": "success"}},
+			"success_effects": {"stats": {"resume_score": 7, "network_score": 3}, "flags": {"interview_done": "success"}},
 			"failure_effects": {"stats": {"heart": -8, "resume_score": 2, "clarity": -1}, "flags": {"interview_done": "failure"}},
 		},
 			"feature_review": {
@@ -1505,7 +1505,7 @@ func _build_pressure_encounters() -> void:
 			"goal": "决定用户标签功能以什么形态上线",
 			"speaker": "评审会议",
 			"opening": "客户要更细的标签，产品要更快的上线，算法要更多字段。所有人的目光都落在你的评审文档上。",
-			"pressure": 88,
+			"pressure": 75,
 			"heart": 48,
 			"preparedness": 42,
 			"rounds": 5,
@@ -1541,7 +1541,7 @@ func _build_pressure_encounters() -> void:
 					"heart_delta": -3,
 					"preparedness_delta": -6,
 					"result": "AI 把伦理争议整理成风险可控表述。所有人都松了一口气。",
-					"effects": {"stats": {"resume_score": 9, "ai_dependence": 9, "language_assimilation": 8, "clarity": -7, "success_progress": 7}, "ai_stage": 6},
+					"effects": {"stats": {"resume_score": 9, "ai_dependence": 9, "clarity": -7}, "ai_stage": 6},
 				},
 				{
 					"id": "review_user_story",
@@ -1555,7 +1555,7 @@ func _build_pressure_encounters() -> void:
 				},
 			],
 				"next_scene": "school_demo",
-			"success_effects": {"stats": {"success_progress": 6, "resume_score": 5}, "flags": {"feature_review_done": "success"}},
+			"success_effects": {"stats": {"resume_score": 5}, "flags": {"feature_review_done": "success"}},
 				"failure_effects": {"stats": {"heart": -9, "clarity": -3, "resume_score": 3}, "flags": {"feature_review_done": "failure"}},
 			},
 			"code_commit": {
@@ -1563,7 +1563,7 @@ func _build_pressure_encounters() -> void:
 				"goal": "决定低收益意愿识别逻辑如何进入主干",
 				"speaker": "代码评审",
 				"opening": "评审机器人提示：该改动可减少用户关键节点高风险路径选择。导师说这只是新人任务。",
-				"pressure": 74,
+				"pressure": 70,
 				"heart": 46,
 				"preparedness": 38,
 				"rounds": 4,
@@ -1599,7 +1599,7 @@ func _build_pressure_encounters() -> void:
 						"preparedness_delta": -6,
 						"ai_recommended": true,
 						"result": "函数名很中性：optimize_decision_support_pipeline。没有一个词看起来残酷。",
-						"effects": {"stats": {"resume_score": 8, "ai_dependence": 8, "language_assimilation": 7, "clarity": -6}, "ai_stage": 6},
+						"effects": {"stats": {"resume_score": 8, "ai_dependence": 8, "clarity": -6}, "ai_stage": 6},
 					},
 					{
 						"id": "commit_human_story",
@@ -1614,7 +1614,7 @@ func _build_pressure_encounters() -> void:
 					},
 				],
 				"next_scene": "model_ops_layer",
-				"success_effects": {"stats": {"success_progress": 4, "resume_score": 3}, "flags": {"code_commit_done": "success"}},
+				"success_effects": {"stats": {"resume_score": 3}, "flags": {"code_commit_done": "success"}},
 				"failure_effects": {"stats": {"heart": -8, "clarity": -4, "resume_score": 5}, "flags": {"code_commit_done": "failure"}},
 			},
 			"release_gate": {
@@ -1622,7 +1622,7 @@ func _build_pressure_encounters() -> void:
 				"goal": "决定标签覆盖现实前是否留下可解释入口",
 				"speaker": "发布面板",
 				"opening": "发布面板显示：完整标签化可提升效率。客户负责人、销售和系统推荐同时等待你按下 CONTINUE。",
-				"pressure": 86,
+				"pressure": 73,
 				"heart": 44,
 				"preparedness": 40,
 				"rounds": 5,
@@ -1658,7 +1658,7 @@ func _build_pressure_encounters() -> void:
 						"preparedness_delta": -6,
 						"ai_recommended": true,
 						"result": "系统把争议包装成灰度策略。所有人的负担都降低了，包括你的。",
-						"effects": {"stats": {"resume_score": 8, "network_score": 4, "ai_dependence": 8, "language_assimilation": 7, "clarity": -7}, "ai_stage": 7},
+						"effects": {"stats": {"resume_score": 8, "network_score": 4, "ai_dependence": 8, "clarity": -7}, "ai_stage": 7},
 					},
 					{
 						"id": "release_open_linzhu_game",
@@ -1673,8 +1673,8 @@ func _build_pressure_encounters() -> void:
 					},
 				],
 				"next_scene": "city_demo_center",
-				"success_effects": {"stats": {"success_progress": 4, "clarity": 4}, "flags": {"release_gate_done": "success"}},
-				"failure_effects": {"stats": {"success_progress": 7, "clarity": -5, "resume_score": 4}, "flags": {"release_gate_done": "failure"}},
+				"success_effects": {"stats": {"clarity": 4}, "flags": {"release_gate_done": "success"}},
+				"failure_effects": {"stats": {"clarity": -5, "resume_score": 4}, "flags": {"release_gate_done": "failure"}},
 			},
 		}
 

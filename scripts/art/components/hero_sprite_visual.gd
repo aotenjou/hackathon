@@ -104,16 +104,6 @@ func _ensure_built() -> void:
 	if _built:
 		return
 
-	var shadow := Polygon2D.new()
-	shadow.color = Color(0, 0, 0, 0.24)
-	shadow.polygon = PackedVector2Array([
-		Vector2(-34, 16),
-		Vector2(34, 16),
-		Vector2(46, 26),
-		Vector2(-46, 26),
-	])
-	add_child(shadow)
-
 	_sprite = AnimatedSprite2D.new()
 	_sprite.centered = true
 	add_child(_sprite)

@@ -96,8 +96,8 @@ func _on_scene_loaded(_scene_id: String, scene_data: Dictionary) -> void:
 	_update_scene_guidance(scene_data)
 	_show_scene_narration(scene_data)
 	hud.notify_progress_checkpoint()
-	if alienation_filter != null and alienation_filter.has_method("trigger_checkpoint_flash"):
-		alienation_filter.trigger_checkpoint_flash()
+	if alienation_filter != null and alienation_filter.has_method("refresh_checkpoint_state"):
+		alienation_filter.refresh_checkpoint_state()
 
 func _show_scene_narration(scene_data: Dictionary) -> void:
 	var narration_id := str(scene_data.get("narration", ""))
