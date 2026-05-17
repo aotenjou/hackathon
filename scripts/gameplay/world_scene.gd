@@ -9,6 +9,7 @@ signal scene_loaded(scene_id: String, scene_data: Dictionary)
 const InteractableScene = preload("res://scenes/InteractableMarker.tscn")
 const PlayerControllerScript = preload("res://scripts/gameplay/player_controller.gd")
 const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture_loader.gd")
+const NpcSpriteVisualScript = preload("res://scripts/art/components/npc_sprite_visual.gd")
 const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
 const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/school_hallway.png"
 const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.png"
@@ -17,6 +18,18 @@ const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/p
 const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.png"
 const PLAYER_LAYER := 20
 const INTERACTABLE_LAYER := 50
+
+const NPC_SPRITE_PATHS := {
+	"林舟": "res://assets/storyline/ch00_cruise_success/characters/linzhou_school.png",
+	"周骁": "res://assets/storyline/ch00_cruise_success/characters/zhouxiao_school.png",
+	"何启朗": "res://assets/storyline/ch00_cruise_success/characters/heqilang_school.png",
+	"沈柚": "res://assets/storyline/ch00_cruise_success/characters/shenyou_school.png",
+	"陈望": "res://assets/storyline/ch00_cruise_success/characters/chenwang_school.png",
+	"班主任": "res://assets/storyline/ch00_cruise_success/characters/teacher_homeroom.png",
+	"父亲": "res://assets/storyline/ch00_cruise_success/characters/father_home.png",
+	"母亲": "res://assets/storyline/ch00_cruise_success/characters/mother_home.png",
+	"门外的母亲": "res://assets/storyline/ch00_cruise_success/characters/mother_home.png",
+}
 
 const PLAYER_STAGE_BY_CHAPTER := {
 	"chapter_0": "adult",
@@ -138,6 +151,28 @@ func _build_npcs(items: Array) -> void:
 		_npc_root.add_child(npc)
 
 func _make_character(role: String, display_name: String) -> Node2D:
+	var sprite_path := str(NPC_SPRITE_PATHS.get(display_name, ""))
+	if not sprite_path.is_empty():
+		return _make_sprite_character(display_name, sprite_path)
+	return _make_placeholder_character(role, display_name)
+
+func _make_sprite_character(display_name: String, sprite_path: String) -> Node2D:
+	var root := Node2D.new()
+	root.name = display_name
+
+	var visual := NpcSpriteVisualScript.new()
+	root.add_child(visual)
+	visual.configure(sprite_path, "idle_three_quarter")
+	visual.set_facing(-1.0 if _should_face_left(display_name) else 1.0)
+
+	var label := _make_character_label(display_name)
+	var display_height := visual.get_display_height()
+	label.position = Vector2(-60, -display_height - 42.0)
+	root.add_child(label)
+
+	return root
+
+func _make_placeholder_character(role: String, display_name: String) -> Node2D:
 	var root := Node2D.new()
 	root.name = display_name
 
@@ -185,6 +220,14 @@ func _make_character(role: String, display_name: String) -> Node2D:
 	hair.position = Vector2(-21, -108)
 	root.add_child(hair)
 
+	var label := _make_character_label(display_name)
+	label.position = Vector2(-55, -148)
+	label.size = Vector2(110, 26)
+	root.add_child(label)
+
+	return root
+
+func _make_character_label(display_name: String) -> Label:
 	var label := Label.new()
 	label.text = display_name
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -192,11 +235,11 @@ func _make_character(role: String, display_name: String) -> Node2D:
 	label.add_theme_color_override("font_shadow_color", Color("0b0d10"))
 	label.add_theme_constant_override("shadow_offset_x", 2)
 	label.add_theme_constant_override("shadow_offset_y", 2)
-	label.position = Vector2(-55, -148)
-	label.size = Vector2(110, 26)
-	root.add_child(label)
+	label.size = Vector2(120, 26)
+	return label
 
-	return root
+func _should_face_left(display_name: String) -> bool:
+	return display_name in ["班主任", "父亲", "母亲", "门外的母亲"]
 
 func _draw_theme(theme: String) -> void:
 	match theme:
