@@ -10,6 +10,8 @@ var _line_label: Label
 var _choices_box: VBoxContainer
 var _active_dialogue := {}
 var _pending_scene := ""
+var _page_lines: Array[String] = []
+var _page_index := 0
 
 var COL_PANEL := Color("111820")
 var COL_PANEL_DARK := Color("090d12")
@@ -31,8 +33,10 @@ func show_dialogue(dialogue_id: String) -> void:
 		return
 	_active_dialogue = dialogue
 	_pending_scene = ""
+	_page_lines = _resolve_pages(dialogue)
+	_page_index = 0
 	_speaker_label.text = str(dialogue.get("speaker", ""))
-	_line_label.text = _resolve_line(dialogue)
+	_line_label.text = _current_page_text()
 	_rebuild_choices(dialogue.get("choices", []))
 	visible = true
 
@@ -141,11 +145,25 @@ func _select_auto_final_ending(choice: Dictionary) -> void:
 	_choices_box.add_child(continue_button)
 
 func _close_or_advance() -> void:
+	if _advance_page():
+		return
 	visible = false
 	if not _pending_scene.is_empty():
 		scene_requested.emit(_pending_scene)
 	else:
 		dialogue_closed.emit()
+
+func _advance_page() -> bool:
+	if _page_index + 1 >= _page_lines.size():
+		return false
+	_page_index += 1
+	_line_label.text = _current_page_text()
+	return true
+
+func _current_page_text() -> String:
+	if _page_lines.is_empty():
+		return ""
+	return _page_lines[clampi(_page_index, 0, _page_lines.size() - 1)]
 
 func _choice_is_used(choice: Dictionary) -> bool:
 	if not _game_state().choice_affects_values(choice):
@@ -316,7 +334,22 @@ func _resolve_line(dialogue: Dictionary) -> String:
 		return _final_life_summary()
 	if dynamic_line == "final_auto_ending":
 		return _final_auto_ending()
+	if dynamic_line == "final_field_epilogue":
+		return "\n".join(_final_field_epilogue_pages())
 	return str(dialogue.get("line", ""))
+
+func _resolve_pages(dialogue: Dictionary) -> Array[String]:
+	var dynamic_line := str(dialogue.get("dynamic_line", ""))
+	if dynamic_line == "final_field_epilogue":
+		return _final_field_epilogue_pages()
+	var pages: Array[String] = []
+	for page in dialogue.get("pages", []):
+		var page_text := str(page)
+		if not page_text.is_empty():
+			pages.append(page_text)
+	if pages.is_empty():
+		pages.append(_resolve_line(dialogue))
+	return pages
 
 func _vertical_slice_summary() -> String:
 	var state := _game_state()
@@ -470,6 +503,31 @@ func _final_auto_ending() -> String:
 		int(percents.get("ai", 0)),
 		ending_name,
 	]
+
+func _final_field_epilogue_pages() -> Array[String]:
+	var ending := str(_game_state().flags.get("final_ending", "coexistence"))
+	match ending:
+		"self_return":
+			return [
+				"风声没有替你总结什么。",
+				"你看见一片田野，才想起自己不是一份完成度报告。",
+				"有些话迟到了很多年，仍然可以由你亲口说出。",
+				"我不知道这是不是正确选择，但这是我说的。",
+			]
+		"optimized_life":
+			return [
+				"田野安静得像一段没有被上传的数据。",
+				"系统已经替你保留了最优路径，也替你省去了许多犹豫。",
+				"可风仍然吹过来，像一个没有收益的问题。",
+				"如果有一天你想回答，它还会在这里。",
+			]
+		_:
+			return [
+				"风从田野上过来，屏幕没有消失，只是退远了一点。",
+				"你还会使用系统，也还会被它影响。",
+				"但这一次，你把没有把握的部分留给了自己。",
+				"自我不是完全正确，而是愿意亲自承担。",
+			]
 
 func _tag_line(friend_id: String, friend_name: String, tag: String, memory: String, relationships: Dictionary, has_memory: bool) -> String:
 	var relation: Dictionary = relationships.get(friend_id, {})
