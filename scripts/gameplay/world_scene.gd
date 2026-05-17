@@ -12,6 +12,7 @@ const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture
 const NpcSpriteVisualScript = preload("res://scripts/art/components/npc_sprite_visual.gd")
 const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
 const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/school_hallway.png"
+const COMPUTER_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/computer_room.png"
 const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.png"
 const GRADUATION_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch02_graduation/backgrounds/graduation_field.png"
 const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.png"
@@ -98,6 +99,7 @@ func load_scene(scene_id: String) -> void:
 
 	player.global_position = scene_data.get("player_position", Vector2(760, 600))
 	player.movement_bounds = scene_data.get("bounds", Rect2(70, 420, 1460, 280))
+	player.set_movement_regions(scene_data.get("walk_regions", []))
 	player.set_age_stage(_player_stage_for_chapter(str(scene_data.get("chapter", "chapter_0"))))
 
 	_game_state().set_context(
@@ -379,6 +381,9 @@ func _draw_school_hallway_placeholder() -> void:
 	_rect(Vector2(124, 655), Vector2(1360, 10), Color("4d4a43"), _background_root)
 
 func _draw_computer_room() -> void:
+	if current_scene_id == "computer_room" and _draw_fullscreen_background(COMPUTER_ROOM_BACKGROUND_PATH):
+		return
+
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("c3c7bd"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 130), Color("45494d"), _background_root)
 	_rect(Vector2(0, 565), Vector2(1600, 160), Color("5e625f"), _background_root)

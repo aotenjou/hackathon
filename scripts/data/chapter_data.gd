@@ -167,6 +167,13 @@ func _build_scenes() -> void:
 			"theme": "computer_room",
 			"player_position": Vector2(760, 610),
 			"bounds": Rect2(80, 420, 1440, 285),
+			"walk_regions": [
+				Rect2(80, 650, 1440, 55),
+				Rect2(120, 595, 320, 55),
+				Rect2(520, 585, 150, 75),
+				Rect2(760, 560, 260, 95),
+				Rect2(1110, 585, 270, 70),
+			],
 			"interactables": [
 				{"id": "volunteer_terminal", "name": "AI 志愿系统", "position": Vector2(880, 545), "kind": "terminal", "dialogue": "d_volunteer_terminal", "label": "志愿系统"},
 				{"id": "terminal_exit", "name": "回到走廊", "position": Vector2(150, 585), "kind": "door", "dialogue": "d_after_volunteer_choice", "label": "出口"},
