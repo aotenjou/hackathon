@@ -49,6 +49,8 @@ flowchart LR
 
 ![人生回放入口](demo/storyline-ui-demos/ch00_life_replay.png)
 
+![大学中庭](../assets/storyline/ch03_university_courtyard/backgrounds/university_courtyard_interactables.png)
+
 Chapter 0 成功未来 -> Chapter 1 高三志愿 -> Chapter 5 星环 offer -> Chapter 8 人生总结。
 
 ### 核心设计功能 2
