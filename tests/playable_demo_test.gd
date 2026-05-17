@@ -5,6 +5,7 @@ const HUDPacked = preload("res://scenes/ui/HUD.tscn")
 const DialoguePacked = preload("res://scenes/ui/DialoguePanel.tscn")
 const PressurePacked = preload("res://scenes/ui/PressureEncounter.tscn")
 const AlienationVisualFilterScript = preload("res://scripts/ui/alienation_visual_filter.gd")
+const WorldSceneScript = preload("res://scripts/gameplay/world_scene.gd")
 const GameStateScript = preload("res://scripts/autoload/game_state.gd")
 const ChapterDataScript = preload("res://scripts/data/chapter_data.gd")
 
@@ -22,6 +23,8 @@ func _initialize() -> void:
 	await _check_ai_transitions_have_non_ai_path()
 	await _check_non_ai_transition_paths()
 	await _check_story_alignment_beats()
+	await _check_school_hallway_task_cluster_alignment()
+	await _check_bridge_sunset_transition()
 	await _check_new_state_persistence()
 	await _check_route_profile_tracking()
 	await _check_self_friction_and_pressure_modifier()
@@ -135,6 +138,37 @@ func _check_effect_references(effects: Dictionary, owner: String) -> void:
 	for relation_id in effects.get("relationships", {}).keys():
 		if not _game_state().relationships.has(str(relation_id)):
 			_failures.append("%s references unknown relationship %s" % [owner, relation_id])
+
+func _check_school_hallway_task_cluster_alignment() -> void:
+	var scene: Dictionary = _chapter_data().get_scene("school_hallway")
+	if scene.is_empty():
+		_failures.append("school hallway scene missing for alignment check")
+		return
+	_expect_equal(str(WorldSceneScript.SCHOOL_HALLWAY_BACKGROUND_PATH), "res://assets/storyline/ch01_school_hallway/backgrounds/school_hallway_task_cluster.png", "school hallway should use task-cluster background")
+	_expect_float_near(float(scene.get("character_scale", 0.0)), 0.78, "school hallway character scale mismatch")
+	var bounds: Rect2 = scene.get("bounds", Rect2())
+	_expect_equal(bounds, Rect2(180, 560, 1240, 160), "school hallway walkable band mismatch")
+
+	for item in scene.get("interactables", []):
+		var item_id := str(item.get("id", ""))
+		var position: Vector2 = item.get("position", Vector2.ZERO)
+		if position.y < 560.0 or position.y > 690.0:
+			_failures.append("school hallway interactable %s is outside task-cluster band: %s" % [item_id, str(position)])
+	for npc in scene.get("npcs", []):
+		var npc_id := str(npc.get("id", ""))
+		var position: Vector2 = npc.get("position", Vector2.ZERO)
+		if position.y < 630.0 or position.y > 690.0:
+			_failures.append("school hallway npc %s is not on the visible floor band: %s" % [npc_id, str(position)])
+
+	var expected_positions := {
+		"volunteer_board": Vector2(760, 585),
+		"teacher": Vector2(1125, 650),
+		"ai_notice": Vector2(1390, 590),
+	}
+	for item in scene.get("interactables", []):
+		var item_id := str(item.get("id", ""))
+		if expected_positions.has(item_id):
+			_expect_equal(item.get("position", Vector2.ZERO), expected_positions[item_id], "school hallway task anchor mismatch for %s" % item_id)
 
 func _check_mainline_reachability() -> void:
 	var reachable := _reachable_scenes("cruise_deck")
@@ -556,6 +590,42 @@ func _check_final_field_epilogue() -> void:
 
 	dialogue.queue_free()
 	await process_frame
+
+func _check_bridge_sunset_transition() -> void:
+	var chapter_data := _chapter_data()
+	var ending: Dictionary = chapter_data.get_dialogue("d_vertical_slice_ending")
+	if ending.is_empty():
+		_failures.append("vertical slice ending dialogue missing")
+		return
+
+	for choice_id in ["slice_to_campus_self", "slice_to_campus_ai"]:
+		var choice: Dictionary = _find_by_id(ending.get("choices", []), choice_id)
+		_expect_equal(str(choice.get("next_scene", "")), "bridge_sunset_transition", "%s should route through bridge sunset transition" % choice_id)
+
+	var bridge: Dictionary = chapter_data.get_scene("bridge_sunset_transition")
+	if bridge.is_empty():
+		_failures.append("bridge sunset transition scene missing")
+		return
+
+	_expect_equal(str(bridge.get("chapter", "")), "chapter_2", "bridge sunset transition should remain in Chapter 2")
+	_expect_equal(str(bridge.get("theme", "")), "bridge_sunset_first_person", "bridge sunset transition theme mismatch")
+	_expect_equal(str(bridge.get("narration", "")), "n_bridge_sunset_transition", "bridge sunset transition narration mismatch")
+	if not bool(bridge.get("hide_player", false)):
+		_failures.append("bridge sunset transition should hide the third-person player")
+	if not bool(bridge.get("hide_hud", false)):
+		_failures.append("bridge sunset transition should hide HUD controls")
+
+	var routes_to_campus := false
+	for interactable in bridge.get("interactables", []):
+		if not interactable.has("dialogue"):
+			continue
+		var dialogue: Dictionary = chapter_data.get_dialogue(str(interactable.get("dialogue", "")))
+		for choice in dialogue.get("choices", []):
+			if str(choice.get("next_scene", "")) == "university_campus":
+				routes_to_campus = true
+
+	if not routes_to_campus:
+		_failures.append("bridge sunset transition does not route onward to university_campus")
 
 func _check_success_guidance_targets() -> void:
 	_reset_state()

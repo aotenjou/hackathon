@@ -11,13 +11,18 @@ const PlayerControllerScript = preload("res://scripts/gameplay/player_controller
 const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture_loader.gd")
 const NpcSpriteVisualScript = preload("res://scripts/art/components/npc_sprite_visual.gd")
 const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
-const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/school_hallway.png"
+const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch01_school_hallway/backgrounds/school_hallway_task_cluster.png"
 const COMPUTER_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/computer_room.png"
 const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.png"
+const CH1_NIGHT_SETTLEMENT_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/ch1_night_settlement.png"
 const GRADUATION_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch02_graduation/backgrounds/graduation_field.png"
+const BRIDGE_SUNSET_BACKGROUND_PATH := "res://assets/storyline/ch02_bridge_sunset/backgrounds/bridge_sunset_first_person.png"
 const CLUB_RECRUITMENT_BACKGROUND_PATH := "res://assets/storyline/ch03_club_recruitment/backgrounds/ch03_club_recruitment.png"
 const DORM_SCHEDULE_AI_BACKGROUND_PATH := "res://assets/storyline/ch03_dorm_schedule_ai/backgrounds/ch03_dorm_schedule_ai.png"
 const BUS_STOP_LINZHU_BACKGROUND_PATH := "res://assets/storyline/ch04_bus_stop_linzhu/backgrounds/ch04_bus_stop_linzhu.png"
+const CLASS_REUNION_BACKGROUND_PATH := "res://assets/storyline/ch04_class_reunion/backgrounds/class_reunion_neon_street.png"
+const INTERVIEW_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch05_interview_room/backgrounds/interview_room_generated.png"
+const SCHOOL_DEMO_BACKGROUND_PATH := "res://assets/storyline/ch07_school_demo/backgrounds/school_demo_no_shenyou.png"
 const FIRST_PERSON_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch08_final_field/backgrounds/blue_field_first_person.png"
 const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.png"
 const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.png"
@@ -102,6 +107,7 @@ func load_scene(scene_id: String) -> void:
 	_build_interactables(scene_data.get("interactables", []))
 
 	player.global_position = scene_data.get("player_position", Vector2(760, 600))
+	player.scale = Vector2.ONE * float(scene_data.get("character_scale", 1.0))
 	player.movement_bounds = scene_data.get("bounds", Rect2(70, 420, 1460, 280))
 	player.set_movement_regions(scene_data.get("walk_regions", []))
 	player.set_age_stage(_player_stage_for_chapter(str(scene_data.get("chapter", "chapter_0"))))
@@ -152,9 +158,11 @@ func _on_marker_activated(marker: Area2D) -> void:
 	interactable_activated.emit(marker.data)
 
 func _build_npcs(items: Array) -> void:
+	var character_scale := float(scene_data.get("character_scale", 1.0))
 	for item in items:
 		var npc := _make_character(str(item.get("role", "student")), str(item.get("name", "NPC")))
 		npc.global_position = item.get("position", Vector2.ZERO)
+		npc.scale = Vector2.ONE * float(item.get("scale", character_scale))
 		_npc_root.add_child(npc)
 
 func _make_character(role: String, display_name: String) -> Node2D:
@@ -258,6 +266,8 @@ func _draw_theme(theme: String) -> void:
 			_draw_home()
 		"graduation":
 			_draw_graduation()
+		"bridge_sunset_first_person":
+			_draw_bridge_sunset_first_person()
 		"university", "campus":
 			_draw_university()
 		"neon_street", "neon":
@@ -409,6 +419,8 @@ func _draw_computer_room() -> void:
 func _draw_home() -> void:
 	if current_scene_id == "dinner_table" and _draw_fullscreen_background(DINNER_TABLE_BACKGROUND_PATH):
 		return
+	if current_scene_id == "ch1_night_settlement" and _draw_fullscreen_background(CH1_NIGHT_SETTLEMENT_BACKGROUND_PATH):
+		return
 	_draw_home_placeholder()
 
 func _draw_home_placeholder() -> void:
@@ -443,29 +455,100 @@ func _draw_university() -> void:
 
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("4b5f68"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 360), Color("8aa8b7"), _background_root)
+	_rect(Vector2(0, 0), Vector2(1600, 92), _color_alpha("d9edf1", 0.22), _background_root)
+	_rect(Vector2(0, 290), Vector2(1600, 70), _color_alpha("6d8895", 0.28), _background_root)
+	for i in range(5):
+		var cloud_x := 115 + i * 320
+		_rect(Vector2(cloud_x, 68 + (i % 2) * 22), Vector2(96, 18), _color_alpha("e8f3f4", 0.36), _background_root)
+		_rect(Vector2(cloud_x + 38, 52 + (i % 2) * 22), Vector2(86, 18), _color_alpha("e8f3f4", 0.26), _background_root)
+
+	for i in range(7):
+		var x := 30 + i * 230
+		var h := 115 + (i % 3) * 24
+		var building_color := Color("6d8790") if i % 2 == 0 else Color("758b92")
+		_rect(Vector2(x, 250 - h), Vector2(165, h), building_color, _background_root)
+		_rect(Vector2(x + 12, 250 - h + 18), Vector2(141, 8), _color_alpha("e7e0c8", 0.32), _background_root)
+		for row in range(3):
+			for col in range(4):
+				_rect(Vector2(x + 24 + col * 32, 250 - h + 42 + row * 25), Vector2(17, 12), _color_alpha("f2efe0", 0.58), _background_root)
+
+	_rect(Vector2(0, 300), Vector2(1600, 60), Color("6a7f66"), _background_root)
+	for i in range(10):
+		_rect(Vector2(16 + i * 164, 318), Vector2(92, 13), Color("52704c"), _background_root)
+		_rect(Vector2(58 + i * 164, 306), Vector2(38, 18), Color("3f7048"), _background_root)
+
 	_rect(Vector2(0, 360), Vector2(1600, 285), Color("4f6f50"), _background_root)
+	_rect(Vector2(650, 360), Vector2(300, 285), _color_alpha("6d7b61", 0.42), _background_root)
+	_line(Vector2(765, 360), Vector2(515, 645), _color_alpha("d7d1bd", 0.32), 8)
+	_line(Vector2(835, 360), Vector2(1085, 645), _color_alpha("d7d1bd", 0.32), 8)
+	_rect(Vector2(0, 622), Vector2(1600, 23), Color("3f5947"), _background_root)
 	_rect(Vector2(0, 635), Vector2(1600, 265), Color("26333b"), _background_root)
+	_rect(Vector2(0, 635), Vector2(1600, 34), _color_alpha("1a242b", 0.35), _background_root)
 	for i in range(12):
 		_rect(Vector2(70 + i * 125, 410 + (i % 2) * 22), Vector2(75, 105), Color("294c35"), _background_root)
 		_rect(Vector2(86 + i * 125, 382 + (i % 2) * 20), Vector2(42, 42), Color("3e7a45"), _background_root)
+		_rect(Vector2(62 + i * 125, 458 + (i % 2) * 22), Vector2(91, 13), _color_alpha("1f3d2b", 0.52), _background_root)
+
+	for i in range(9):
+		var x := 38 + i * 184
+		_rect(Vector2(x, 588), Vector2(112, 18), Color("456844"), _background_root)
+		_rect(Vector2(x + 12, 574), Vector2(88, 20), Color("5f7f50"), _background_root)
+
 	for i in range(18):
 		_line(Vector2(i * 92, 660), Vector2(55 + i * 92, 900), Color("34414a"), 3)
+	for i in range(9):
+		_line(Vector2(0, 680 + i * 28), Vector2(1600, 646 + i * 20), _color_alpha("42505a", 0.56), 2)
+	_rect(Vector2(650, 645), Vector2(300, 255), _color_alpha("2f4149", 0.8), _background_root)
+	_line(Vector2(650, 645), Vector2(470, 900), Color("3b4c55"), 3)
+	_line(Vector2(950, 645), Vector2(1130, 900), Color("3b4c55"), 3)
+	for i in range(6):
+		_line(Vector2(630 - i * 34, 700 + i * 42), Vector2(970 + i * 34, 700 + i * 42), _color_alpha("46545d", 0.58), 2)
+
 	_rect(Vector2(95, 108), Vector2(390, 338), Color("6f4b38"), _background_root)
 	_rect(Vector2(125, 145), Vector2(330, 260), Color("9b7354"), _background_root)
+	_rect(Vector2(118, 132), Vector2(345, 14), Color("b38b68"), _background_root)
 	for row in range(3):
 		for col in range(4):
 			_rect(Vector2(155 + col * 70, 170 + row * 66), Vector2(42, 34), Color("d3d6c4"), _background_root)
+			_rect(Vector2(159 + col * 70, 174 + row * 66), Vector2(34, 6), _color_alpha("f5f1da", 0.48), _background_root)
 	_rect(Vector2(255, 338), Vector2(70, 67), Color("34251e"), _background_root)
+	_rect(Vector2(332, 337), Vector2(92, 68), Color("745035"), _background_root)
+	_label("新生报到处", Vector2(336, 350), Vector2(82, 36), 18, Color("f6edd8"))
 	_label("学生宿舍", Vector2(205, 118), Vector2(170, 42), 30, Color("f6edd8"))
+
+	_rect(Vector2(510, 285), Vector2(50, 122), Color("3c4a50"), _background_root)
+	_rect(Vector2(528, 252), Vector2(14, 40), Color("2f3d44"), _background_root)
+	_rect(Vector2(500, 246), Vector2(70, 22), Color("25343b"), _background_root)
+	_label("项目\n分组", Vector2(506, 270), Vector2(58, 50), 20, Color("8be3ff"))
+
 	_rect(Vector2(585, 160), Vector2(420, 235), Color("323b43"), _background_root)
 	_rect(Vector2(620, 195), Vector2(350, 155), Color("1d2730"), _background_root)
+	_rect(Vector2(596, 393), Vector2(410, 20), Color("263039"), _background_root)
+	for i in range(5):
+		_rect(Vector2(660 + i * 54, 362), Vector2(32, 48), Color("28373f"), _background_root)
+		_rect(Vector2(669 + i * 54, 370), Vector2(14, 27), _color_alpha("8be3ff", 0.22), _background_root)
 	_label("社团招新\n算法队 / 影像社\n创业工坊\n今晚路演", Vector2(655, 215), Vector2(275, 120), 28, Color("8be3ff"))
+
+	_rect(Vector2(1010, 420), Vector2(40, 160), Color("22313a"), _background_root)
+	_rect(Vector2(1000, 475), Vector2(56, 48), Color("f2d0ad"), _background_root)
+	_rect(Vector2(1062, 466), Vector2(26, 16), Color("f6edd8"), _background_root)
+	_line(Vector2(1088, 474), Vector2(1062, 488), Color("f6edd8"), 2)
+
 	_rect(Vector2(1110, 118), Vector2(330, 285), Color("5d4635"), _background_root)
 	_rect(Vector2(1145, 158), Vector2(260, 200), Color("c7ae8e"), _background_root)
+	_rect(Vector2(1132, 142), Vector2(284, 19), Color("7f644c"), _background_root)
 	_label("课程表\n8:00 高数\n10:00 程序设计\n19:00 项目会", Vector2(1170, 180), Vector2(210, 140), 25, Color("4b2e24"))
+
+	_rect(Vector2(1450, 320), Vector2(18, 165), Color("364951"), _background_root)
+	_rect(Vector2(1405, 312), Vector2(108, 44), Color("25343b"), _background_root)
+	_label("图书馆 ->", Vector2(1410, 322), Vector2(98, 24), 18, Color("f6edd8"))
+	_rect(Vector2(1460, 372), Vector2(92, 38), Color("25343b"), _background_root)
+	_label("食堂", Vector2(1488, 380), Vector2(38, 24), 18, Color("f6edd8"))
 
 func _draw_neon_street() -> void:
 	if current_scene_id == "neon_street" and _draw_fullscreen_background(BUS_STOP_LINZHU_BACKGROUND_PATH):
+		return
+	if current_scene_id == "class_reunion" and _draw_fullscreen_background(CLASS_REUNION_BACKGROUND_PATH):
 		return
 
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("071019"), _background_root)
@@ -491,6 +574,9 @@ func _draw_neon_street() -> void:
 	_label("离线留言墙\n朋友最后在线\n23:48", Vector2(1145, 270), Vector2(225, 95), 28, Color("8be3ff"))
 
 func _draw_interview() -> void:
+	if current_scene_id == "interview_room" and _draw_fullscreen_background(INTERVIEW_ROOM_BACKGROUND_PATH):
+		return
+
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("d3d9df"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 420), Color("9caab5"), _background_root)
 	_rect(Vector2(0, 420), Vector2(1600, 280), Color("56616b"), _background_root)
@@ -533,6 +619,8 @@ func _draw_office() -> void:
 		_rect(Vector2(265 + i * 180, 540), Vector2(120, 20), Color("1d2730"), _background_root)
 
 func _draw_school_demo() -> void:
+	if _draw_fullscreen_background(SCHOOL_DEMO_BACKGROUND_PATH):
+		return
 	_draw_school_hallway()
 	_rect(Vector2(700, 90), Vector2(590, 300), Color("071927"), _background_root)
 	_label("学校合作演示\n终身协同助理\n问题改写 -> 路径建议\n低收益愿望: 折叠", Vector2(745, 130), Vector2(420, 150), 29, Color("8be3ff"))
@@ -592,6 +680,27 @@ func _draw_first_person_field() -> void:
 		_line(Vector2(20 + i * 58, 900), Vector2(42 + i * 57, 650 + (i % 5) * 24), Color("2f6d35"), 5)
 	_rect(Vector2(250, 780), Vector2(250, 120), Color("4b6787"), _background_root)
 	_rect(Vector2(380, 742), Vector2(170, 86), Color("d1a07f"), _background_root)
+
+func _draw_bridge_sunset_first_person() -> void:
+	if _draw_fullscreen_background(BRIDGE_SUNSET_BACKGROUND_PATH):
+		return
+	_rect(Vector2.ZERO, Vector2(1600, 900), Color("6d5d7a"), _background_root)
+	_rect(Vector2(0, 0), Vector2(1600, 410), Color("d97842"), _background_root)
+	_rect(Vector2(0, 410), Vector2(1600, 190), Color("5a5667"), _background_root)
+	_rect(Vector2(0, 600), Vector2(1600, 300), Color("2b2f3a"), _background_root)
+	for i in range(18):
+		var x := 120 + i * 78
+		var h := 80 + (i % 5) * 36
+		_rect(Vector2(x, 430 - h), Vector2(44, h), Color("3c3d4d"), _background_root)
+	_rect(Vector2(650, 330), Vector2(72, 72), Color("ffd476"), _background_root)
+	for i in range(7):
+		_line(Vector2(120 + i * 110, 520), Vector2(580 + i * 84, 700), Color("41434e"), 7)
+	_rect(Vector2(0, 650), Vector2(1600, 38), Color("3b3841"), _background_root)
+	_rect(Vector2(0, 735), Vector2(1600, 52), Color("1f232b"), _background_root)
+	for i in range(16):
+		_rect(Vector2(i * 110, 685), Vector2(18, 215), Color("252933"), _background_root)
+	_rect(Vector2(430, 690), Vector2(190, 150), Color("9b6144"), _background_root)
+	_rect(Vector2(1060, 690), Vector2(190, 150), Color("9b6144"), _background_root)
 
 func _add_bottom_centered_sprite(path: String, anchor: Vector2, z_index: int = 0) -> void:
 	var texture := ArtTextureLoaderScript.load_png_texture(path)

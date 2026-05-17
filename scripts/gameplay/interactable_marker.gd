@@ -30,6 +30,11 @@ func get_display_name() -> String:
 func _apply_visuals() -> void:
 	if data.is_empty() or _label == null:
 		return
+	if bool(data.get("hide_marker_visual", false)):
+		_label.visible = false
+		if _icon != null:
+			_icon.visible = false
+		return
 	var kind := str(data.get("kind", ""))
 	_label.text = _marker_text(kind)
 	_label.add_theme_color_override("font_color", Color("f6edd8"))

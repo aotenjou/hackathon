@@ -16,7 +16,7 @@ func _initialize() -> void:
 
 	var failures: Array[String] = []
 
-	for scene_id in ["cruise_deck", "school_hallway", "computer_room", "dinner_table", "graduation_field"]:
+	for scene_id in ["cruise_deck", "school_hallway", "computer_room", "dinner_table", "graduation_field", "bridge_sunset_transition"]:
 		var scene_data: Dictionary = _chapter_data().get_scene(scene_id)
 		if scene_data.is_empty():
 			failures.append("missing scene: %s" % scene_id)
@@ -36,6 +36,8 @@ func _initialize() -> void:
 		"d_graduation_message",
 		"d_friend_time",
 		"d_vertical_slice_ending",
+		"n_bridge_sunset_transition",
+		"d_bridge_to_campus",
 	]:
 		var dialogue: Dictionary = _chapter_data().get_dialogue(dialogue_id)
 		if dialogue.is_empty():
