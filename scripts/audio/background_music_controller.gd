@@ -70,10 +70,6 @@ func _configure_loop(stream: Resource) -> void:
 			return
 
 func _load_audio_stream(track_path: String) -> Resource:
-	if ClassDB.class_exists("AudioStreamMP3") and ClassDB.class_has_method("AudioStreamMP3", "load_from_file"):
-		var mp3_stream := AudioStreamMP3.load_from_file(track_path)
-		if mp3_stream != null:
-			return mp3_stream
 	return load(track_path)
 
 func _game_state() -> Node:

@@ -4,9 +4,9 @@ extends Node2D
 const ArtTextureLoaderScript := preload("res://scripts/art/components/art_texture_loader.gd")
 
 const HERO_STAGE_PATHS := {
-	"school": "res://assets/storyline/ch00_cruise_success/characters/hero_1.png",
-	"college": "res://assets/storyline/ch00_cruise_success/characters/hero_2.png",
-	"adult": "res://assets/storyline/ch00_cruise_success/characters/hero_3.png",
+	"school": "res://assets/storyline/ch00_cruise_success/characters/hero_1.webp",
+	"college": "res://assets/storyline/ch00_cruise_success/characters/hero_2.webp",
+	"adult": "res://assets/storyline/ch00_cruise_success/characters/hero_3.webp",
 }
 
 const HERO_STAGE_ALIASES := {

@@ -32,7 +32,7 @@ func _check_manifest() -> void:
 	for path in [
 		str(manifest.get("source", "")),
 		str(manifest.get("background", "")),
-		"res://assets/storyline/ch00_cruise_success/ui/ui_hotspot_badge.png",
+		"res://assets/storyline/ch00_cruise_success/ui/ui_hotspot_badge.webp",
 	]:
 		if not FileAccess.file_exists(path):
 			_failures.append("missing art split asset: %s" % path)

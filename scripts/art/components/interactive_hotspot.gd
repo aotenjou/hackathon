@@ -5,7 +5,7 @@ signal focused(hotspot_id: String)
 signal activated(hotspot_id: String)
 
 const ArtTextureLoaderScript := preload("res://scripts/art/components/art_texture_loader.gd")
-const HOTSPOT_BADGE_PATH := "res://assets/storyline/ch00_cruise_success/ui/ui_hotspot_badge.png"
+const HOTSPOT_BADGE_PATH := "res://assets/storyline/ch00_cruise_success/ui/ui_hotspot_badge.webp"
 
 var data := {}
 var hotspot_id := ""

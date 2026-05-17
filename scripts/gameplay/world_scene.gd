@@ -10,35 +10,35 @@ const InteractableScene = preload("res://scenes/InteractableMarker.tscn")
 const PlayerControllerScript = preload("res://scripts/gameplay/player_controller.gd")
 const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture_loader.gd")
 const NpcSpriteVisualScript = preload("res://scripts/art/components/npc_sprite_visual.gd")
-const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
-const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch01_school_hallway/backgrounds/school_hallway_task_cluster.png"
-const COMPUTER_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/computer_room.png"
-const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.png"
-const CH1_NIGHT_SETTLEMENT_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/ch1_night_settlement.png"
-const GRADUATION_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch02_graduation/backgrounds/graduation_field.png"
-const BRIDGE_SUNSET_BACKGROUND_PATH := "res://assets/storyline/ch02_bridge_sunset/backgrounds/bridge_sunset_first_person.png"
-const CLUB_RECRUITMENT_BACKGROUND_PATH := "res://assets/storyline/ch03_club_recruitment/backgrounds/ch03_club_recruitment.png"
-const DORM_SCHEDULE_AI_BACKGROUND_PATH := "res://assets/storyline/ch03_dorm_schedule_ai/backgrounds/ch03_dorm_schedule_ai.png"
-const BUS_STOP_LINZHU_BACKGROUND_PATH := "res://assets/storyline/ch04_bus_stop_linzhu/backgrounds/ch04_bus_stop_linzhu.png"
-const CLASS_REUNION_BACKGROUND_PATH := "res://assets/storyline/ch04_class_reunion/backgrounds/class_reunion_neon_street.png"
-const INTERVIEW_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch05_interview_room/backgrounds/interview_room_generated.png"
-const SCHOOL_DEMO_BACKGROUND_PATH := "res://assets/storyline/ch07_school_demo/backgrounds/school_demo_no_shenyou.png"
-const FIRST_PERSON_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch08_final_field/backgrounds/blue_field_first_person.png"
-const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.png"
-const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.png"
+const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.webp"
+const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch01_school_hallway/backgrounds/school_hallway_task_cluster.webp"
+const COMPUTER_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/computer_room.webp"
+const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.webp"
+const CH1_NIGHT_SETTLEMENT_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/ch1_night_settlement.webp"
+const GRADUATION_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch02_graduation/backgrounds/graduation_field.webp"
+const BRIDGE_SUNSET_BACKGROUND_PATH := "res://assets/storyline/ch02_bridge_sunset/backgrounds/bridge_sunset_first_person.webp"
+const CLUB_RECRUITMENT_BACKGROUND_PATH := "res://assets/storyline/ch03_club_recruitment/backgrounds/ch03_club_recruitment.webp"
+const DORM_SCHEDULE_AI_BACKGROUND_PATH := "res://assets/storyline/ch03_dorm_schedule_ai/backgrounds/ch03_dorm_schedule_ai.webp"
+const BUS_STOP_LINZHU_BACKGROUND_PATH := "res://assets/storyline/ch04_bus_stop_linzhu/backgrounds/ch04_bus_stop_linzhu.webp"
+const CLASS_REUNION_BACKGROUND_PATH := "res://assets/storyline/ch04_class_reunion/backgrounds/class_reunion_neon_street.webp"
+const INTERVIEW_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch05_interview_room/backgrounds/interview_room_generated.webp"
+const SCHOOL_DEMO_BACKGROUND_PATH := "res://assets/storyline/ch07_school_demo/backgrounds/school_demo_no_shenyou.webp"
+const FIRST_PERSON_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch08_final_field/backgrounds/blue_field_first_person.webp"
+const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.webp"
+const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.webp"
 const PLAYER_LAYER := 20
 const INTERACTABLE_LAYER := 50
 
 const NPC_SPRITE_PATHS := {
-	"林舟": "res://assets/storyline/ch00_cruise_success/characters/linzhou_school.png",
-	"周骁": "res://assets/storyline/ch00_cruise_success/characters/zhouxiao_school.png",
-	"何启朗": "res://assets/storyline/ch00_cruise_success/characters/heqilang_school.png",
-	"沈柚": "res://assets/storyline/ch00_cruise_success/characters/shenyou_school.png",
-	"陈望": "res://assets/storyline/ch00_cruise_success/characters/chenwang_school.png",
-	"班主任": "res://assets/storyline/ch00_cruise_success/characters/teacher_homeroom.png",
-	"父亲": "res://assets/storyline/ch00_cruise_success/characters/father_home.png",
-	"母亲": "res://assets/storyline/ch00_cruise_success/characters/mother_home.png",
-	"门外的母亲": "res://assets/storyline/ch00_cruise_success/characters/mother_home.png",
+	"林舟": "res://assets/storyline/ch00_cruise_success/characters/linzhou_school.webp",
+	"周骁": "res://assets/storyline/ch00_cruise_success/characters/zhouxiao_school.webp",
+	"何启朗": "res://assets/storyline/ch00_cruise_success/characters/heqilang_school.webp",
+	"沈柚": "res://assets/storyline/ch00_cruise_success/characters/shenyou_school.webp",
+	"陈望": "res://assets/storyline/ch00_cruise_success/characters/chenwang_school.webp",
+	"班主任": "res://assets/storyline/ch00_cruise_success/characters/teacher_homeroom.webp",
+	"父亲": "res://assets/storyline/ch00_cruise_success/characters/father_home.webp",
+	"母亲": "res://assets/storyline/ch00_cruise_success/characters/mother_home.webp",
+	"门外的母亲": "res://assets/storyline/ch00_cruise_success/characters/mother_home.webp",
 }
 
 const PLAYER_STAGE_BY_CHAPTER := {

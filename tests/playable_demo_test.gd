@@ -144,7 +144,7 @@ func _check_school_hallway_task_cluster_alignment() -> void:
 	if scene.is_empty():
 		_failures.append("school hallway scene missing for alignment check")
 		return
-	_expect_equal(str(WorldSceneScript.SCHOOL_HALLWAY_BACKGROUND_PATH), "res://assets/storyline/ch01_school_hallway/backgrounds/school_hallway_task_cluster.png", "school hallway should use task-cluster background")
+		_expect_equal(str(WorldSceneScript.SCHOOL_HALLWAY_BACKGROUND_PATH), "res://assets/storyline/ch01_school_hallway/backgrounds/school_hallway_task_cluster.webp", "school hallway should use task-cluster background")
 	_expect_float_near(float(scene.get("character_scale", 0.0)), 0.78, "school hallway character scale mismatch")
 	var bounds: Rect2 = scene.get("bounds", Rect2())
 	_expect_equal(bounds, Rect2(180, 560, 1240, 160), "school hallway walkable band mismatch")
