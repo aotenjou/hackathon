@@ -2,6 +2,7 @@
 
 这是一个 Godot 4.x 横屏 16:9 原型，实现 Chapter 0-8 的可走通 demo。当前版本使用程序化占位美术和数据驱动纵切：场景、对话、选择效果与压力遭遇由数据表驱动，视觉资产用于验证流程、节奏和交互闭环。
 
+- 评审 / 游玩文档：[docs/play_guide.md](docs/play_guide.md)。
 - Chapter 0：游轮成功未来、成功路径面板、人生回放入口。
 - Chapter 1：高三走廊、AI 志愿系统、家长饭桌压力遭遇。
 - Chapter 2：毕业典礼、毕业留言、朋友时间分配、阶段结算。
@@ -11,6 +12,15 @@
 - Chapter 6：第一个工位、需求评审、功能评审压力遭遇。
 - Chapter 7：城市演示中心、标签化市民案例、上线结算。
 - Chapter 8：人生总结覆盖层、旧消息回声、基于路径权重的自动结局判定。
+
+当前 BGM 由章节阶段自动切换，每个阶段使用一首曲目：
+
+| 阶段 | 覆盖章节 | BGM |
+| --- | --- | --- |
+| 高中 / 毕业 | Chapter 0-2 | `assets/bgm/Isaac Shepard - Felicity.mp3` |
+| 大学 / 退学线 | Chapter 3-4 | `assets/bgm/mj apanay,aren park - time machine (feat. aren park).mp3` |
+| 面试 / 工作 | Chapter 5-6 | `assets/bgm/dont be so serious.mp3` |
+| 城市演示 / 终章 | Chapter 7-8 | `assets/bgm/give up.mp3` |
 
 ## 运行
 
@@ -43,11 +53,12 @@
 
 ```bash
 HOME=/tmp /tmp/godot-4.2.2/Godot_v4.2.2-stable_linux.x86_64 --headless --path . -s res://tests/smoke_test.gd
+HOME=/tmp /tmp/godot-4.2.2/Godot_v4.2.2-stable_linux.x86_64 --headless --path . -s res://tests/background_music_test.gd
 HOME=/tmp /tmp/godot-4.2.2/Godot_v4.2.2-stable_linux.x86_64 --headless --path . -s res://tests/flow_test.gd
 HOME=/tmp /tmp/godot-4.2.2/Godot_v4.2.2-stable_linux.x86_64 --headless --path . -s res://tests/playable_demo_test.gd
 ```
 
-`playable_demo_test.gd` 覆盖 Chapter 0-8 主线可达性、所有 scene/dialogue/pressure 引用完整性、Chapter 3-8 关键旗标写入、门控行为、压力遭遇成功/失败分支，以及对话效果落库。
+`background_music_test.gd` 覆盖四段章节到 BGM 的映射；`playable_demo_test.gd` 覆盖 Chapter 0-8 主线可达性、所有 scene/dialogue/pressure 引用完整性、Chapter 3-8 关键旗标写入、门控行为、压力遭遇成功/失败分支，以及对话效果落库。
 
 当前环境下建议带 `HOME=/tmp` 运行 headless 测试，避免 Godot 写 `user://logs` 时受本机用户目录限制影响。
 
@@ -63,4 +74,5 @@ HOME=/tmp /tmp/godot-4.2.2/Godot_v4.2.2-stable_linux.x86_64 --headless --path . 
 - `scripts/autoload/game_state.gd`：全局章节、数值、关系、背包、选择记录。
 - `scripts/data/chapter_data.gd`：章节、场景、对话、选择效果和压力遭遇数据。
 - `scripts/gameplay/world_scene.gd`：按数据生成横向场景、NPC、交互点和主角。
+- `scripts/audio/background_music_controller.gd`：监听章节变化并按四个阶段切换 BGM。
 - `scripts/ui/`：HUD、虚拟摇杆、对话面板、压力遭遇界面。

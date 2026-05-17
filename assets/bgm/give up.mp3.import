@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://biyacfck7weyb"
+path="res://.godot/imported/give up.mp3-6d5d7db3d2509f8c6348b58170bdc53c.mp3str"
+
+[deps]
+
+source_file="res://assets/bgm/give up.mp3"
+dest_files=["res://.godot/imported/give up.mp3-6d5d7db3d2509f8c6348b58170bdc53c.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

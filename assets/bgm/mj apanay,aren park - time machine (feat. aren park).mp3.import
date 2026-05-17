@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://deb2vqal2ad63"
+path="res://.godot/imported/mj apanay,aren park - time machine (feat. aren park).mp3-fbca08b43a61ca692a2dd0dd1482cda2.mp3str"
+
+[deps]
+
+source_file="res://assets/bgm/mj apanay,aren park - time machine (feat. aren park).mp3"
+dest_files=["res://.godot/imported/mj apanay,aren park - time machine (feat. aren park).mp3-fbca08b43a61ca692a2dd0dd1482cda2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

@@ -5,15 +5,20 @@ const HUDPacked = preload("res://scenes/ui/HUD.tscn")
 const DialoguePacked = preload("res://scenes/ui/DialoguePanel.tscn")
 const PressurePacked = preload("res://scenes/ui/PressureEncounter.tscn")
 const AlienationVisualFilterScript = preload("res://scripts/ui/alienation_visual_filter.gd")
+const BackgroundMusicControllerScript = preload("res://scripts/audio/background_music_controller.gd")
 
 var world: Node
 var hud: CanvasLayer
 var dialogue: CanvasLayer
 var pressure: CanvasLayer
 var alienation_filter: CanvasLayer
+var background_music: Node
 
 func _ready() -> void:
 	_game_state().reset_for_new_game()
+
+	background_music = BackgroundMusicControllerScript.new()
+	add_child(background_music)
 
 	world = WorldScenePacked.instantiate()
 	add_child(world)

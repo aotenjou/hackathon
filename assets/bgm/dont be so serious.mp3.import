@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dc43f584g4e5s"
+path="res://.godot/imported/dont be so serious.mp3-f39aaaf694dbadcdbc2fc44054a1408e.mp3str"
+
+[deps]
+
+source_file="res://assets/bgm/dont be so serious.mp3"
+dest_files=["res://.godot/imported/dont be so serious.mp3-f39aaaf694dbadcdbc2fc44054a1408e.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

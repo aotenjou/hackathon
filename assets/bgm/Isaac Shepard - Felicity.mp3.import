@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dio7u7s0l588x"
+path="res://.godot/imported/Isaac Shepard - Felicity.mp3-12e715f245ca548180f2e7e9e3bf2ed9.mp3str"
+
+[deps]
+
+source_file="res://assets/bgm/Isaac Shepard - Felicity.mp3"
+dest_files=["res://.godot/imported/Isaac Shepard - Felicity.mp3-12e715f245ca548180f2e7e9e3bf2ed9.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
