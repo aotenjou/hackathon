@@ -49,9 +49,11 @@ flowchart LR
 
 ![人生回放入口](demo/storyline-ui-demos/ch00_life_replay.png)
 
-![大学中庭](../assets/storyline/ch03_university_courtyard/backgrounds/university_courtyard_interactables.png)
+![大学中庭](../assets/storyline/ch03_university_courtyard/backgrounds/university_campus_generated.png)
 
 Chapter 0 成功未来 -> Chapter 1 高三志愿 -> Chapter 5 星环 offer -> Chapter 8 人生总结。
+
+场景背景图片化覆盖：当前游戏内已将大学中庭、旧网吧、简历流水线、星环 offer、星环大厅、第一个工位、模型运营层、城市服务中心和最终人生总结覆盖层接入为 16:9 正式背景图；旧 demo 参考图仍保留用于文档和对照，不替换历史素材。
 
 ### 核心设计功能 2
 
@@ -69,7 +71,7 @@ Chapter 0 成功未来 -> Chapter 1 高三志愿 -> Chapter 5 星环 offer -> Ch
 
 功能名称：AI 优化与朋友关系双轨反馈
 
-设计意图 / 解决的问题：AI 路线短期收益更清晰，但会让朋友消息、兴趣和不成熟表达逐渐被摘要和标签化。朋友不是功能 NPC，而是不同人生路径的镜子，帮助玩家感到“低收益关系”仍然具体。
+设计意图 / 解决的问题：AI 路线短期收益更清晰，但会让朋友消息、兴趣和不成熟表达逐渐被摘要和标签化。朋友不是功能 NPC，而是不同人生路径的镜子，帮助玩家感到“低收益关系”仍然具体。最终章新增离线副本、审计协议、朋友申诉样本和旧电话等分支，自动结局扩展为“样本外的人 / 亲自到场 / 维护一条边界 / 保留人工复核 / 接受最优人生”五类。
 
 关键截图 / 流程：
 
@@ -79,6 +81,6 @@ Chapter 0 成功未来 -> Chapter 1 高三志愿 -> Chapter 5 星环 offer -> Ch
 
 ## 四、未来规划 (如果晋级，下一步怎么做)
 
-- 近 3 个月：补齐 Chapter 0-8 可玩细节，完善压力遭遇数值、关键对白、关系反馈、BGM 节奏和截图级 UI 表现。
+- 近 3 个月：补齐 Chapter 0-8 可玩细节，完善压力遭遇数值、关键对白、关系反馈、结局差分演出、BGM 节奏和截图级 UI 表现。
 - 中长期 (1 年内)：制作完整移动端版本，扩展多结局、朋友支线、真实像素资产、存档回放和无障碍阅读体验。
 - 商业化或落地设想 (如适用)：先以叙事短篇付费版或展会 demo 落地，再拓展校园 AI 素养工作坊、互动展陈和教育讨论版本。

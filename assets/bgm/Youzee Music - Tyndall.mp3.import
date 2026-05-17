@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://d1nus2hgsmmfs"
+path="res://.godot/imported/Youzee Music - Tyndall.mp3-b91545067096df926f0a8476c974763f.mp3str"
+
+[deps]
+
+source_file="res://assets/bgm/Youzee Music - Tyndall.mp3"
+dest_files=["res://.godot/imported/Youzee Music - Tyndall.mp3-b91545067096df926f0a8476c974763f.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

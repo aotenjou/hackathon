@@ -29,6 +29,7 @@ func _initialize() -> void:
 	await _check_route_profile_tracking()
 	await _check_self_friction_and_pressure_modifier()
 	await _check_final_ending_resolution()
+	await _check_expanded_final_branches()
 	await _check_auto_final_ending_dialogue()
 	await _check_final_field_epilogue()
 	await _check_stats_panel_toggle()
@@ -512,6 +513,38 @@ func _check_final_ending_resolution() -> void:
 		game_state.record_choice("ai_path_%d" % index, "ai", "AI", "result", 2, {"stats": {"ai_dependence": 1}})
 	game_state.stats["ai_dependence"] = 75
 	_expect_equal(str(game_state.resolve_final_ending().get("ending", "")), "optimized_life", "ai-heavy ending should resolve to optimized_life")
+
+	_reset_state()
+	game_state = _game_state()
+	for index in range(4):
+		game_state.record_choice("outside_path_%d" % index, "self", "样本外", "result", 2, {"stats": {"clarity": 1}})
+	game_state.stats["clarity"] = 70
+	game_state.flags["outside_model"] = true
+	game_state.flags["life_upload"] = "offline"
+	game_state.inventory.append("离线人生副本")
+	_expect_equal(str(game_state.resolve_final_ending().get("ending", "")), "outside_model", "offline final branch should resolve to outside_model")
+
+	_reset_state()
+	game_state = _game_state()
+	for index in range(4):
+		game_state.record_choice("audit_path_%d" % index, "safe", "审计", "result", 2, {"stats": {"stability_score": 1}})
+	game_state.flags["audit_trail"] = true
+	game_state.flags["life_summary"] = "audited"
+	game_state.flags["life_upload"] = "audit_contract"
+	game_state.flags["friend_echoes"] = "audit_samples"
+	game_state.flags["city_launch"] = "reviewable"
+	_expect_equal(str(game_state.resolve_final_ending().get("ending", "")), "system_steward", "audit-heavy branch should resolve to system_steward")
+
+func _check_expanded_final_branches() -> void:
+	var final_echo: Dictionary = _chapter_data().get_dialogue("d_final_linzhou_echo")
+	_expect_has_choice(final_echo.get("choices", []), "final_echo_call", "final echo should include phone-call branch")
+	var life_summary: Dictionary = _chapter_data().get_dialogue("d_final_life_summary")
+	_expect_has_choice(life_summary.get("choices", []), "final_summary_steward", "life summary should include audit branch")
+	var friend_echoes: Dictionary = _chapter_data().get_dialogue("d_final_friend_echoes")
+	_expect_has_choice(friend_echoes.get("choices", []), "final_echoes_audit", "friend echoes should include audit sample branch")
+	var upload: Dictionary = _chapter_data().get_dialogue("d_upload_life_model")
+	_expect_has_choice(upload.get("choices", []), "upload_export_offline", "upload should include offline branch")
+	_expect_has_choice(upload.get("choices", []), "upload_audit_contract", "upload should include audit contract branch")
 
 func _check_auto_final_ending_dialogue() -> void:
 	_reset_state()
@@ -1386,6 +1419,12 @@ func _find_by_id(items: Array, expected_id: String) -> Dictionary:
 			return item
 	_failures.append("missing item id %s" % expected_id)
 	return {}
+
+func _expect_has_choice(choices: Array, expected_id: String, message: String) -> void:
+	for choice in choices:
+		if str(choice.get("id", "")) == expected_id:
+			return
+	_failures.append(message)
 
 func _dialogue_has_non_ai_transition_to(choices: Array, expected_scene: String) -> bool:
 	for choice in choices:

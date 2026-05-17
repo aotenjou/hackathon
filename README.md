@@ -11,7 +11,9 @@
 - Chapter 5：星环智能实习面试、实时提示、结构化面试压力遭遇。
 - Chapter 6：第一个工位、需求评审、功能评审压力遭遇。
 - Chapter 7：城市演示中心、标签化市民案例、上线结算。
-- Chapter 8：人生总结覆盖层、旧消息回声、基于路径权重的自动结局判定。
+- Chapter 8：人生总结覆盖层、旧消息回声、离线 / 审计 / 上传分支，以及基于路径权重的自动结局判定。
+
+当前自动结局包含 5 类：样本外的人、亲自到场、维护一条边界、保留人工复核、接受最优人生。最终判定综合全程自我 / 规训 / AI 权重、清醒度、AI 依赖、记忆锚点、人工复核护栏和最终章特殊选择。
 
 当前 BGM 由章节阶段自动切换，每个阶段使用一首曲目：
 
@@ -21,6 +23,8 @@
 | 大学 / 退学线 | Chapter 3-4 | `assets/bgm/mj apanay,aren park - time machine (feat. aren park).mp3` |
 | 面试 / 工作 | Chapter 5-6 | `assets/bgm/dont be so serious.mp3` |
 | 城市演示 / 终章 | Chapter 7-8 | `assets/bgm/give up.mp3` |
+
+最后一幕 `final_field_epilogue` 会覆盖终章阶段曲目，播放 `assets/bgm/Youzee Music - Tyndall.mp3`。
 
 ## 运行
 
@@ -74,5 +78,5 @@ HOME=/tmp /tmp/godot-4.2.2/Godot_v4.2.2-stable_linux.x86_64 --headless --path . 
 - `scripts/autoload/game_state.gd`：全局章节、数值、关系、背包、选择记录。
 - `scripts/data/chapter_data.gd`：章节、场景、对话、选择效果和压力遭遇数据。
 - `scripts/gameplay/world_scene.gd`：按数据生成横向场景、NPC、交互点和主角。
-- `scripts/audio/background_music_controller.gd`：监听章节变化并按四个阶段切换 BGM。
+- `scripts/audio/background_music_controller.gd`：监听章节变化并按四个阶段切换 BGM，支持最终场景曲目覆盖。
 - `scripts/ui/`：HUD、虚拟摇杆、对话面板、压力遭遇界面。

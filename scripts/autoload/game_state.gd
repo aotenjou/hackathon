@@ -377,13 +377,19 @@ func resolve_final_ending() -> Dictionary:
 	var memory_count := _memory_anchor_count()
 	var guardrail_count := _guardrail_count()
 	var success_gap := _total_success_gap()
+	var outside_model_count := _outside_model_count()
+	var audit_count := _audit_trail_count()
 
 	var self_score := float(ratios.get(STRATEGY_SELF, 0.0)) * 100.0 + float(clarity) * 0.35 + float(memory_count) * 5.0 - float(success_gap) * 0.25
 	var safe_score := float(ratios.get(STRATEGY_SAFE, 0.0)) * 100.0 + float(stability) * 0.3 + float(guardrail_count) * 5.0
 	var ai_score := float(ratios.get(STRATEGY_AI, 0.0)) * 100.0 + float(ai_dependence) * 0.35 + float(language_assimilation) * 0.35 + float(success_progress) * 0.15
 
 	var ending := "coexistence"
-	if str(flags.get("life_upload", "")) == "uploaded" or str(flags.get("life_summary", "")) == "accepted":
+	if outside_model_count >= 2 and clarity >= 55:
+		ending = "outside_model"
+	elif audit_count >= 2 and guardrail_count >= 3:
+		ending = "system_steward"
+	elif str(flags.get("life_upload", "")) == "uploaded" or str(flags.get("life_summary", "")) == "accepted":
 		ending = "optimized_life"
 	elif ai_score >= self_score and ai_score >= safe_score:
 		ending = "optimized_life"
@@ -401,6 +407,8 @@ func resolve_final_ending() -> Dictionary:
 		},
 		"memory_count": memory_count,
 		"guardrail_count": guardrail_count,
+		"outside_model_count": outside_model_count,
+		"audit_count": audit_count,
 		"success_gap": success_gap,
 		"profile": profile,
 	}
@@ -859,8 +867,12 @@ func _self_friction_summary(tier: int) -> String:
 
 func _final_ending_effects(ending: String, result_text: String) -> Dictionary:
 	match ending:
+		"outside_model":
+			return {"stats": {"clarity": 24, "resume_score": -10, "ai_dependence": -12}, "flags": {"ending": "outside_model", "final_ending": "outside_model"}, "settlement": {"id": "ending_outside_model", "title": "样本外逃逸结局", "body": result_text}, "ai_stage": 8}
 		"self_return":
 			return {"stats": {"clarity": 20, "ai_dependence": -8}, "flags": {"ending": "self_return", "final_ending": "self_return"}, "settlement": {"id": "ending_self", "title": "微弱反抗结局", "body": result_text}, "ai_stage": 8}
+		"system_steward":
+			return {"stats": {"stability_score": 12, "clarity": 8, "resume_score": 4}, "flags": {"ending": "system_steward", "final_ending": "system_steward"}, "settlement": {"id": "ending_steward", "title": "维护者结局", "body": result_text}, "ai_stage": 8}
 		"optimized_life":
 			return {"stats": {"resume_score": 8, "ai_dependence": 12, "clarity": -12}, "flags": {"ending": "optimized_life", "final_ending": "optimized_life"}, "settlement": {"id": "ending_ai", "title": "顺从结局", "body": result_text}, "ai_stage": 9}
 		_:
@@ -875,8 +887,12 @@ func _final_ending_result_text(ending: String, resolved: Dictionary) -> String:
 		int(percents.get(STRATEGY_AI, 0)),
 	]
 	match ending:
+		"outside_model":
+			return "%s\n许临导出了一份不会继续优化的离线副本，也留下了无法被系统解释的空白。他失去了一些可展示的路径，却第一次从样本之外回看自己。" % route_line
 		"self_return":
 			return "%s\n许临没有摧毁 AI，也没有救世。他承认自己为自我选择付出了 %d 次现实代价，然后打开林舟的试玩版，亲自写下一段不保证正确的反馈。" % [route_line, realistic_losses.size()]
+		"system_steward":
+			return "%s\n许临没有退出系统，而是把默认同意改成审计、申诉和责任边界。它仍然不浪漫，但每一次判断终于能被具体的人追问。" % route_line
 		"optimized_life":
 			return "%s\n许临成为人格协同系统的优秀样本和负责人。生活稳定、高效、无人责怪，系统比他自己更擅长继续他的人生。" % route_line
 		_:
@@ -884,8 +900,12 @@ func _final_ending_result_text(ending: String, resolved: Dictionary) -> String:
 
 func _final_ending_title(ending: String) -> String:
 	match ending:
+		"outside_model":
+			return "样本外的人"
 		"self_return":
 			return "亲自到场"
+		"system_steward":
+			return "维护一条边界"
 		"optimized_life":
 			return "接受最优人生"
 		_:
@@ -893,8 +913,12 @@ func _final_ending_title(ending: String) -> String:
 
 func _strategy_for_ending(ending: String) -> String:
 	match ending:
+		"outside_model":
+			return STRATEGY_SELF
 		"self_return":
 			return STRATEGY_SELF
+		"system_steward":
+			return STRATEGY_SAFE
 		"optimized_life":
 			return STRATEGY_AI
 		_:
@@ -920,7 +944,32 @@ func _guardrail_count() -> int:
 			count += 1
 	for key in ["city_launch", "city_rollout_done", "tag_policy", "life_upload", "life_summary", "review_position"]:
 		var value := str(flags.get(key, ""))
-		if value in ["limited", "reviewable", "review_note", "delayed", "annotated", "mitigated"]:
+		if value in ["limited", "reviewable", "review_note", "delayed", "audit_contract", "annotated", "audited", "mitigated"]:
+			count += 1
+	return count
+
+func _outside_model_count() -> int:
+	var count := 0
+	for key in ["outside_model"]:
+		if bool(flags.get(key, false)):
+			count += 1
+	for key in ["life_upload", "final_echo"]:
+		var value := str(flags.get(key, ""))
+		if value in ["offline", "called"]:
+			count += 1
+	for item in inventory:
+		if str(item).contains("离线"):
+			count += 1
+	return count
+
+func _audit_trail_count() -> int:
+	var count := 0
+	for key in ["audit_trail"]:
+		if bool(flags.get(key, false)):
+			count += 1
+	for key in ["life_upload", "life_summary", "friend_echoes"]:
+		var value := str(flags.get(key, ""))
+		if value in ["audit_contract", "audited", "audit_samples"]:
 			count += 1
 	return count
 

@@ -17,12 +17,21 @@ const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_succes
 const CH1_NIGHT_SETTLEMENT_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/ch1_night_settlement.webp"
 const GRADUATION_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch02_graduation/backgrounds/graduation_field.webp"
 const BRIDGE_SUNSET_BACKGROUND_PATH := "res://assets/storyline/ch02_bridge_sunset/backgrounds/bridge_sunset_first_person.webp"
+const UNIVERSITY_CAMPUS_BACKGROUND_PATH := "res://assets/storyline/ch03_university_courtyard/backgrounds/university_campus_generated.png"
 const CLUB_RECRUITMENT_BACKGROUND_PATH := "res://assets/storyline/ch03_club_recruitment/backgrounds/ch03_club_recruitment.webp"
 const DORM_SCHEDULE_AI_BACKGROUND_PATH := "res://assets/storyline/ch03_dorm_schedule_ai/backgrounds/ch03_dorm_schedule_ai.webp"
 const BUS_STOP_LINZHU_BACKGROUND_PATH := "res://assets/storyline/ch04_bus_stop_linzhu/backgrounds/ch04_bus_stop_linzhu.webp"
+const INTERNET_CAFE_BACKGROUND_PATH := "res://assets/storyline/ch04_internet_cafe_demo/backgrounds/internet_cafe_demo_generated.png"
 const CLASS_REUNION_BACKGROUND_PATH := "res://assets/storyline/ch04_class_reunion/backgrounds/class_reunion_neon_street.webp"
+const RESUME_PIPELINE_BACKGROUND_PATH := "res://assets/storyline/ch05_resume_pipeline/backgrounds/resume_pipeline_generated.png"
 const INTERVIEW_ROOM_BACKGROUND_PATH := "res://assets/storyline/ch05_interview_room/backgrounds/interview_room_generated.webp"
+const OFFER_ARRIVAL_BACKGROUND_PATH := "res://assets/storyline/ch05_offer_arrival/backgrounds/offer_arrival_generated.png"
+const STARLOOP_LOBBY_BACKGROUND_PATH := "res://assets/storyline/ch06_xinghuan_lobby/backgrounds/starloop_lobby_generated.png"
+const STARLOOP_OFFICE_BACKGROUND_PATH := "res://assets/storyline/ch06_first_workstation/backgrounds/starloop_office_generated.png"
+const MODEL_OPS_LAYER_BACKGROUND_PATH := "res://assets/storyline/ch06_friend_samples/backgrounds/model_ops_layer_generated.png"
 const SCHOOL_DEMO_BACKGROUND_PATH := "res://assets/storyline/ch07_school_demo/backgrounds/school_demo_no_shenyou.webp"
+const CITY_DEMO_CENTER_BACKGROUND_PATH := "res://assets/storyline/ch07_city_service_labels/backgrounds/city_demo_center_generated.png"
+const FINAL_OVERLAY_BACKGROUND_PATH := "res://assets/storyline/ch08_overlap_maps/backgrounds/final_overlay_generated.png"
 const FIRST_PERSON_FIELD_BACKGROUND_PATH := "res://assets/storyline/ch08_final_field/backgrounds/blue_field_first_person.webp"
 const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.webp"
 const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.webp"
@@ -450,6 +459,8 @@ func _draw_graduation() -> void:
 	_label("毕业照\n阶段总结", Vector2(1305, 275), Vector2(120, 70), 28, Color("f6edd8"))
 
 func _draw_university() -> void:
+	if current_scene_id == "university_campus" and _draw_fullscreen_background(UNIVERSITY_CAMPUS_BACKGROUND_PATH):
+		return
 	if current_scene_id == "club_recruitment" and _draw_fullscreen_background(CLUB_RECRUITMENT_BACKGROUND_PATH):
 		return
 
@@ -548,6 +559,8 @@ func _draw_university() -> void:
 func _draw_neon_street() -> void:
 	if current_scene_id == "neon_street" and _draw_fullscreen_background(BUS_STOP_LINZHU_BACKGROUND_PATH):
 		return
+	if current_scene_id == "internet_cafe_demo" and _draw_fullscreen_background(INTERNET_CAFE_BACKGROUND_PATH):
+		return
 	if current_scene_id == "class_reunion" and _draw_fullscreen_background(CLASS_REUNION_BACKGROUND_PATH):
 		return
 
@@ -574,7 +587,11 @@ func _draw_neon_street() -> void:
 	_label("离线留言墙\n朋友最后在线\n23:48", Vector2(1145, 270), Vector2(225, 95), 28, Color("8be3ff"))
 
 func _draw_interview() -> void:
+	if current_scene_id == "resume_pipeline" and _draw_fullscreen_background(RESUME_PIPELINE_BACKGROUND_PATH):
+		return
 	if current_scene_id == "interview_room" and _draw_fullscreen_background(INTERVIEW_ROOM_BACKGROUND_PATH):
+		return
+	if current_scene_id == "offer_arrival" and _draw_fullscreen_background(OFFER_ARRIVAL_BACKGROUND_PATH):
 		return
 
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("d3d9df"), _background_root)
@@ -595,6 +612,13 @@ func _draw_interview() -> void:
 	_rect(Vector2(940, 530), Vector2(170, 26), Color("d96b6b"), _background_root)
 
 func _draw_office() -> void:
+	if current_scene_id == "starloop_lobby" and _draw_fullscreen_background(STARLOOP_LOBBY_BACKGROUND_PATH):
+		return
+	if current_scene_id == "starloop_office" and _draw_fullscreen_background(STARLOOP_OFFICE_BACKGROUND_PATH):
+		return
+	if current_scene_id == "model_ops_layer" and _draw_fullscreen_background(MODEL_OPS_LAYER_BACKGROUND_PATH):
+		return
+
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("16202a"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 410), Color("202b36"), _background_root)
 	_rect(Vector2(0, 410), Vector2(1600, 245), Color("4a535a"), _background_root)
@@ -629,6 +653,9 @@ func _draw_school_demo() -> void:
 	_rect(Vector2(1075, 315), Vector2(120, 28), Color("d96b6b"), _background_root)
 
 func _draw_city_center() -> void:
+	if current_scene_id == "city_demo_center" and _draw_fullscreen_background(CITY_DEMO_CENTER_BACKGROUND_PATH):
+		return
+
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("d8dde1"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 390), Color("b9c9d7"), _background_root)
 	_rect(Vector2(0, 390), Vector2(1600, 280), Color("7a8b91"), _background_root)
@@ -647,6 +674,9 @@ func _draw_city_center() -> void:
 	_rect(Vector2(1080, 535), Vector2(190, 24), Color("d96b6b"), _background_root)
 
 func _draw_final_overlay() -> void:
+	if current_scene_id == "final_overlay" and _draw_fullscreen_background(FINAL_OVERLAY_BACKGROUND_PATH):
+		return
+
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("121820"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 330), Color("1f3141"), _background_root)
 	_rect(Vector2(0, 330), Vector2(1600, 310), Color("334738"), _background_root)
@@ -721,6 +751,8 @@ func _draw_fullscreen_background(path: String) -> bool:
 		return false
 
 	var background := Sprite2D.new()
+	background.name = "FullscreenBackground"
+	background.set_meta("source_path", path)
 	background.texture = texture
 	background.centered = true
 	background.position = Vector2(800, 450)

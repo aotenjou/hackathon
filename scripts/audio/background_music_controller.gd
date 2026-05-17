@@ -7,6 +7,9 @@ const STAGE_TRACKS := {
 	"work": "res://assets/bgm/dont be so serious.mp3",
 	"final": "res://assets/bgm/give up.mp3",
 }
+const SCENE_TRACK_OVERRIDES := {
+	"final_field_epilogue": "res://assets/bgm/Youzee Music - Tyndall.mp3",
+}
 const CHAPTER_STAGE := {
 	"chapter_0": "school",
 	"chapter_1": "school",
@@ -21,6 +24,8 @@ const CHAPTER_STAGE := {
 
 var _player: AudioStreamPlayer
 var _current_stage := ""
+var _current_scene_id := ""
+var _current_track_path := ""
 
 func _ready() -> void:
 	_player = AudioStreamPlayer.new()
@@ -35,19 +40,33 @@ func _ready() -> void:
 
 func _on_chapter_changed(chapter_id: String) -> void:
 	var stage := str(CHAPTER_STAGE.get(chapter_id, "school"))
-	if stage == _current_stage:
-		return
-	_current_stage = stage
-	_play_stage(stage)
+	_apply_context(stage, _current_scene_id)
+
+func set_scene_context(scene_id: String, chapter_id: String = "") -> void:
+	var resolved_chapter_id := chapter_id
+	if resolved_chapter_id.is_empty():
+		var game_state := _game_state()
+		if game_state != null:
+			resolved_chapter_id = str(game_state.get("current_chapter_id"))
+	var stage := str(CHAPTER_STAGE.get(resolved_chapter_id, "school"))
+	_apply_context(stage, scene_id)
 
 func get_current_stage() -> String:
 	return _current_stage
 
 func get_current_track_path() -> String:
-	return str(STAGE_TRACKS.get(_current_stage, ""))
+	return _current_track_path
 
-func _play_stage(stage: String) -> void:
-	var track_path := str(STAGE_TRACKS.get(stage, ""))
+func _apply_context(stage: String, scene_id: String) -> void:
+	var track_path := str(SCENE_TRACK_OVERRIDES.get(scene_id, STAGE_TRACKS.get(stage, "")))
+	if stage == _current_stage and scene_id == _current_scene_id and track_path == _current_track_path:
+		return
+	_current_stage = stage
+	_current_scene_id = scene_id
+	_current_track_path = track_path
+	_play_track(track_path)
+
+func _play_track(track_path: String) -> void:
 	if track_path.is_empty():
 		_player.stop()
 		return

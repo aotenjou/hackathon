@@ -1146,6 +1146,7 @@ func _build_dialogue() -> void:
 			"line": "你也要让那个系统替你想吗？旧消息没有红点，却在最终总结上方停了很久。",
 			"choices": [
 				_choice("final_echo_self", "亲手回复迟到很多年的话", STRATEGY_SELF, "你写：我让它替我想了很多年，但现在这句不是。", {"stats": {"clarity": 12, "heart": -4}, "relationships": {"linzhou": {"warmth": 10, "utility": -4}}, "items": ["迟到的回复"], "flags": {"final_echo": "replied"}, "ai_stage": 8}),
+				_choice("final_echo_call", "拨通林舟的旧号码", STRATEGY_SELF, "号码已经空了。你却第一次没有把无回应交给系统处理，只把这段空白留在总结外面。", {"stats": {"clarity": 16, "heart": -6, "resume_score": -2}, "relationships": {"linzhou": {"warmth": 14, "utility": -6}}, "items": ["无人接听的通话记录"], "flags": {"final_echo": "called", "outside_model": true}, "ai_stage": 8}),
 				_choice("final_echo_safe", "把消息归档", STRATEGY_SAFE, "归档成功。它不会再打断总结，也不会真的消失。", {"stats": {"stability_score": 4, "heart": 2}, "flags": {"final_echo": "archived"}, "ai_stage": 8}),
 				_choice("final_echo_ai", "让 AI 生成体面告别", STRATEGY_AI, "告别很完整，甚至替你道了歉。你盯着发送按钮，认不出那是谁的遗憾。", {"stats": {"ai_dependence": 8, "clarity": -8}, "relationships": {"linzhou": {"warmth": -4, "utility": 4}}, "flags": {"final_echo": "generated"}, "ai_stage": 8}),
 			],
@@ -1157,6 +1158,7 @@ func _build_dialogue() -> void:
 			"choices": [
 				_choice("final_summary_self", "逐句改回不完整的自己", STRATEGY_SELF, "总结变得不那么漂亮：错过、犹豫、沉默和迟到都回来了。它终于不像简历。", {"stats": {"clarity": 15}, "items": ["不完整的人生总结"], "flags": {"life_summary": "rewritten"}, "ai_stage": 8}),
 				_choice("final_summary_safe", "保留总结但加一段注释", STRATEGY_SAFE, "注释说：以上并非全部。系统接受了这个低风险补丁。", {"stats": {"stability_score": 5, "clarity": 3}, "items": ["带注释的人生总结"], "flags": {"life_summary": "annotated"}, "ai_stage": 8}),
+				_choice("final_summary_steward", "改写成可审计版本", STRATEGY_SAFE, "你没有删掉系统，只把每个判断后面都加上来源、人工责任人和申诉路径。它不漂亮，但终于能被追问。", {"stats": {"stability_score": 10, "clarity": 6, "resume_score": -1}, "items": ["可审计人生总结"], "flags": {"life_summary": "audited", "audit_trail": true}, "ai_stage": 8}),
 				_choice("final_summary_ai", "采用系统最终稿", STRATEGY_AI, "最终稿无可挑剔。它把你的一生压缩成一条清晰、稳定、可展示的成功路径。", {"stats": {"ai_dependence": 10, "clarity": -10}, "items": ["成功人生最终稿"], "flags": {"life_summary": "accepted"}, "ai_stage": 9}),
 				],
 			},
@@ -1167,6 +1169,7 @@ func _build_dialogue() -> void:
 				"choices": [
 					_choice("final_echoes_self", "逐个听完", STRATEGY_SELF, "它们没有给你答案，只把你从总结里拉回关系。", {"stats": {"clarity": 10, "heart": -5}, "flags": {"friend_echoes": "heard"}}),
 					_choice("final_echoes_safe", "保留到稍后", STRATEGY_SAFE, "稍后文件夹很整齐，里面全是没有被处理的人。", {"stats": {"stability_score": 3}, "flags": {"friend_echoes": "later"}}),
+					_choice("final_echoes_audit", "把朋友标签写入申诉样本", STRATEGY_SAFE, "你没有替他们说完，只把每一次被误读都变成能追责的案例。系统第一次要求你确认责任人。", {"stats": {"stability_score": 8, "clarity": 4}, "flags": {"friend_echoes": "audit_samples", "audit_trail": true}}),
 					_choice("final_echoes_ai", "生成关系摘要", STRATEGY_AI, "摘要很完整：无需立即回应。你突然厌倦完整。", {"stats": {"ai_dependence": 6, "clarity": -6}, "flags": {"friend_echoes": "summarized"}, "ai_stage": 8}),
 				],
 			},
@@ -1175,7 +1178,9 @@ func _build_dialogue() -> void:
 				"line": "您已达到推荐人生模型。是否上传你的人生，用于下一代优化模型？",
 				"choices": [
 					_choice("upload_refuse", "删除总结，暂不上传", STRATEGY_SELF, "按钮停了一秒，像系统没有准备好这句低效回答。", {"stats": {"clarity": 12}, "flags": {"life_upload": "refused"}, "items": ["删除过的人生总结"]}),
+					_choice("upload_export_offline", "导出离线副本后断开", STRATEGY_SELF, "系统提示离线副本无法继续优化。你点了确认，把一份不再更新的人生带出屏幕。", {"stats": {"clarity": 18, "heart": -8, "resume_score": -4}, "flags": {"life_upload": "offline", "outside_model": true}, "items": ["离线人生副本"], "ai_stage": 8}),
 					_choice("upload_delay", "稍后上传", STRATEGY_SAFE, "系统接受延期。它把拒绝也整理成一个可管理状态。", {"stats": {"stability_score": 4}, "flags": {"life_upload": "delayed"}}),
+					_choice("upload_audit_contract", "上传前要求审计协议", STRATEGY_SAFE, "协议很长，法务窗口很慢。你把上传变成一次带责任边界的合作，而不是默认同意。", {"stats": {"stability_score": 9, "network_score": 2}, "flags": {"life_upload": "audit_contract", "audit_trail": true}, "ai_stage": 8}),
 					_choice("upload_accept", "上传", STRATEGY_AI, "按钮再次出现：上传。你按下去后，系统把你标记为优秀样本。", {"stats": {"ai_dependence": 10, "clarity": -10}, "flags": {"life_upload": "uploaded"}, "ai_stage": 9}),
 				],
 			},

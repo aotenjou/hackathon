@@ -101,6 +101,8 @@ func _load_scene(scene_id: String) -> void:
 func _on_scene_loaded(_scene_id: String, scene_data: Dictionary) -> void:
 	_update_scene_guidance(scene_data)
 	_update_scene_presentation(scene_data)
+	if background_music != null and background_music.has_method("set_scene_context"):
+		background_music.set_scene_context(_scene_id, str(scene_data.get("chapter", "")))
 	_show_scene_narration(scene_data)
 	hud.notify_progress_checkpoint()
 	if alienation_filter != null and alienation_filter.has_method("refresh_checkpoint_state"):

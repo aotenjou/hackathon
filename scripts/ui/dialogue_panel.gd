@@ -493,10 +493,15 @@ func _final_auto_ending() -> String:
 	var percents: Dictionary = profile.get("percents", {})
 	var ending := str(resolved.get("ending", "coexistence"))
 	var ending_name := "保留人工复核"
-	if ending == "self_return":
-		ending_name = "亲自到场"
-	elif ending == "optimized_life":
-		ending_name = "接受最优人生"
+	match ending:
+		"outside_model":
+			ending_name = "样本外的人"
+		"self_return":
+			ending_name = "亲自到场"
+		"system_steward":
+			ending_name = "维护一条边界"
+		"optimized_life":
+			ending_name = "接受最优人生"
 	return "最终结局将由全程路径自动生成。\n路径权重：自我 %d / 社会规训 %d / AI %d。\n当前判定倾向：%s。" % [
 		int(percents.get("self", 0)),
 		int(percents.get("safe", 0)),
@@ -507,12 +512,26 @@ func _final_auto_ending() -> String:
 func _final_field_epilogue_pages() -> Array[String]:
 	var ending := str(_game_state().flags.get("final_ending", "coexistence"))
 	match ending:
+		"outside_model":
+			return [
+				"风声没有联网。",
+				"离线副本安静地躺在你手里，它不会继续变好，也不会替你解释。",
+				"你失去了一些被推荐的路，却保住了几处无法被推荐的空白。",
+				"样本外不是胜利，只是终于有一小段人生不再自动上传。",
+			]
 		"self_return":
 			return [
 				"风声没有替你总结什么。",
 				"你看见一片田野，才想起自己不是一份完成度报告。",
 				"有些话迟到了很多年，仍然可以由你亲口说出。",
 				"我不知道这是不是正确选择，但这是我说的。",
+			]
+		"system_steward":
+			return [
+				"田野旁的屏幕还亮着。",
+				"你没有把它砸碎，只是在每个结论后面留下来源、申诉和责任人。",
+				"这不是浪漫的反抗，更像一份迟到的维护文档。",
+				"但有人被误读时，终于可以问：是谁决定的？",
 			]
 		"optimized_life":
 			return [
