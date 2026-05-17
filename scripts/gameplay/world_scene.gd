@@ -10,6 +10,8 @@ const InteractableScene = preload("res://scenes/InteractableMarker.tscn")
 const PlayerControllerScript = preload("res://scripts/gameplay/player_controller.gd")
 const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture_loader.gd")
 const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
+const SCHOOL_HALLWAY_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/school_hallway.png"
+const DINNER_TABLE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/dinner_table.png"
 const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.png"
 const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.png"
 
@@ -223,18 +225,8 @@ func _draw_cruise() -> void:
 	_draw_cruise_placeholder()
 
 func _draw_cruise_art() -> bool:
-	var texture := ArtTextureLoaderScript.load_png_texture(CRUISE_BACKGROUND_PATH)
-	if texture == null:
+	if not _draw_fullscreen_background(CRUISE_BACKGROUND_PATH):
 		return false
-
-	var background := Sprite2D.new()
-	background.texture = texture
-	background.centered = true
-	background.position = Vector2(800, 450)
-	var scale_factor := maxf(1600.0 / float(texture.get_width()), 900.0 / float(texture.get_height()))
-	background.scale = Vector2.ONE * scale_factor
-	background.z_index = -200
-	_background_root.add_child(background)
 
 	_add_bottom_centered_sprite(CRUISE_SUCCESS_PANEL_PATH, Vector2(920, 690), 6)
 	_add_bottom_centered_sprite(CRUISE_BADGE_TERMINAL_PATH, Vector2(1490, 735), 6)
@@ -312,6 +304,11 @@ func _draw_cruise_placeholder() -> void:
 	_rect(Vector2(1334, 497), Vector2(56, 36), Color("d8a13a"), _background_root)
 
 func _draw_school_hallway() -> void:
+	if current_scene_id == "school_hallway" and _draw_fullscreen_background(SCHOOL_HALLWAY_BACKGROUND_PATH):
+		return
+	_draw_school_hallway_placeholder()
+
+func _draw_school_hallway_placeholder() -> void:
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("d7d1bf"), _background_root)
 	for i in range(26):
 		_line(Vector2(i * 64, 0), Vector2(i * 64, 900), Color("bdb5a4"), 2)
@@ -347,6 +344,11 @@ func _draw_computer_room() -> void:
 	_label("<- 走廊", Vector2(110, 505), Vector2(100, 35), 25, Color("f6edd8"))
 
 func _draw_home() -> void:
+	if current_scene_id == "dinner_table" and _draw_fullscreen_background(DINNER_TABLE_BACKGROUND_PATH):
+		return
+	_draw_home_placeholder()
+
+func _draw_home_placeholder() -> void:
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("5e4b3a"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 430), Color("b59678"), _background_root)
 	_rect(Vector2(0, 620), Vector2(1600, 280), Color("3a251d"), _background_root)
@@ -519,6 +521,21 @@ func _add_bottom_centered_sprite(path: String, anchor: Vector2, z_index: int = 0
 	sprite.offset = Vector2(0, -float(texture.get_height()) / 2.0)
 	sprite.z_index = z_index
 	_background_root.add_child(sprite)
+
+func _draw_fullscreen_background(path: String) -> bool:
+	var texture := ArtTextureLoaderScript.load_png_texture(path)
+	if texture == null:
+		return false
+
+	var background := Sprite2D.new()
+	background.texture = texture
+	background.centered = true
+	background.position = Vector2(800, 450)
+	var scale_factor := maxf(1600.0 / float(texture.get_width()), 900.0 / float(texture.get_height()))
+	background.scale = Vector2.ONE * scale_factor
+	background.z_index = -200
+	_background_root.add_child(background)
+	return true
 
 func _rect(pos: Vector2, size: Vector2, color: Color, parent: Node) -> ColorRect:
 	var rect := ColorRect.new()

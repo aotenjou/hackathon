@@ -57,7 +57,7 @@ const HERO_STAGE_RECTS := {
 	},
 }
 
-const TARGET_DISPLAY_HEIGHT := 188.0
+const TARGET_DISPLAY_HEIGHT := 228.0
 const WALK_FPS := 7.0
 
 var current_stage := "adult"
