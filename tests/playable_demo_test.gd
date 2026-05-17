@@ -523,6 +523,9 @@ func _check_final_field_epilogue() -> void:
 		_failures.append("final field epilogue should hide HUD controls")
 	if not bool(scene.get("suppress_alienation_filter", false)):
 		_failures.append("final field epilogue should suppress grayscale alienation filter")
+	var ending_node: Dictionary = _chapter_data().get_dialogue("d_final_three_endings")
+	var ending_choice: Dictionary = _find_by_id(ending_node.get("choices", []), "ending_auto_resolve")
+	_expect_equal(str(ending_choice.get("next_scene", "")), "final_field_epilogue", "final ending should route to field epilogue")
 
 	var dialogue := DialoguePacked.instantiate()
 	root.add_child(dialogue)
@@ -894,8 +897,11 @@ func _check_final_field_scene_presentation() -> void:
 	main._load_scene("final_field_epilogue")
 	await process_frame
 
-	_expect_equal(str(world.current_scene_id), "final_field_epilogue", "final field scene did not load")
-	if world.player.visible:
+	_expect_equal(str(world.get("current_scene_id")), "final_field_epilogue", "final field scene did not load")
+	var player: Node = world.get("player")
+	if player == null:
+		_failures.append("final field player missing")
+	elif bool(player.visible):
 		_failures.append("final field scene should hide world player")
 	if hud.visible:
 		_failures.append("final field scene should hide HUD")
