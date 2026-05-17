@@ -99,13 +99,13 @@ func _build_scenes() -> void:
 			"objective": "打开人生回放，回到高三关键节点",
 			"narration": "n_cruise_deck",
 			"theme": "cruise",
-			"player_position": Vector2(650, 600),
-			"bounds": Rect2(80, 430, 1440, 265),
+			"player_position": Vector2(695, 685),
+			"bounds": Rect2(320, 500, 1180, 220),
 			"interactables": [
 				{
 					"id": "phone_success",
 					"name": "成功面板",
-					"position": Vector2(650, 590),
+					"position": Vector2(920, 690),
 					"kind": "panel",
 					"dialogue": "d_cruise_success",
 					"label": "职业成就",
@@ -113,7 +113,7 @@ func _build_scenes() -> void:
 				{
 					"id": "replay_terminal",
 					"name": "人生回放",
-					"position": Vector2(900, 570),
+					"position": Vector2(1490, 735),
 					"kind": "terminal",
 					"dialogue": "d_life_replay",
 					"label": "人生回放",
@@ -121,16 +121,13 @@ func _build_scenes() -> void:
 				{
 					"id": "banquet_board",
 					"name": "酒会名单",
-					"position": Vector2(1240, 525),
+					"position": Vector2(520, 520),
 					"kind": "board",
 					"dialogue": "d_banquet_board",
 					"label": "行业名单",
 				},
 			],
-			"npcs": [
-				{"id": "guest_a", "name": "晚宴来客", "position": Vector2(250, 510), "role": "guest"},
-				{"id": "guest_b", "name": "庆祝", "position": Vector2(390, 510), "role": "guest"},
-			],
+			"npcs": [],
 		},
 		"school_hallway": {
 			"chapter": "chapter_1",

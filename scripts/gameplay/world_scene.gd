@@ -8,6 +8,10 @@ signal scene_loaded(scene_id: String, scene_data: Dictionary)
 
 const InteractableScene = preload("res://scenes/InteractableMarker.tscn")
 const PlayerControllerScript = preload("res://scripts/gameplay/player_controller.gd")
+const ArtTextureLoaderScript = preload("res://scripts/art/components/art_texture_loader.gd")
+const CRUISE_BACKGROUND_PATH := "res://assets/storyline/ch00_cruise_success/backgrounds/01.png"
+const CRUISE_SUCCESS_PANEL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_success_panel.png"
+const CRUISE_BADGE_TERMINAL_PATH := "res://assets/storyline/ch00_cruise_success/props/prop_starloop_badge_terminal.png"
 
 const PLAYER_STAGE_BY_CHAPTER := {
 	"chapter_0": "adult",
@@ -214,6 +218,29 @@ func _draw_theme(theme: String) -> void:
 			_draw_school_hallway()
 
 func _draw_cruise() -> void:
+	if _draw_cruise_art():
+		return
+	_draw_cruise_placeholder()
+
+func _draw_cruise_art() -> bool:
+	var texture := ArtTextureLoaderScript.load_png_texture(CRUISE_BACKGROUND_PATH)
+	if texture == null:
+		return false
+
+	var background := Sprite2D.new()
+	background.texture = texture
+	background.centered = true
+	background.position = Vector2(800, 450)
+	var scale_factor := maxf(1600.0 / float(texture.get_width()), 900.0 / float(texture.get_height()))
+	background.scale = Vector2.ONE * scale_factor
+	background.z_index = -200
+	_background_root.add_child(background)
+
+	_add_bottom_centered_sprite(CRUISE_SUCCESS_PANEL_PATH, Vector2(920, 690), 6)
+	_add_bottom_centered_sprite(CRUISE_BADGE_TERMINAL_PATH, Vector2(1490, 735), 6)
+	return true
+
+func _draw_cruise_placeholder() -> void:
 	_rect(Vector2.ZERO, Vector2(1600, 900), Color("07111d"), _background_root)
 	_rect(Vector2(0, 0), Vector2(1600, 325), Color("15243a"), _background_root)
 	_rect(Vector2(0, 165), Vector2(1600, 195), _color_alpha("233452", 0.74), _background_root)
@@ -479,6 +506,19 @@ func _draw_final_overlay() -> void:
 	_label("城市服务演示中心\n所有地图重叠在这里", Vector2(640, 535), Vector2(330, 58), 26, Color("26323b"))
 	_rect(Vector2(1040, 510), Vector2(360, 120), _color_alpha("071927", 0.84), _background_root)
 	_label("是否上传人生模型?\n上传 / 上传", Vector2(1090, 535), Vector2(240, 58), 28, Color("8be3ff"))
+
+func _add_bottom_centered_sprite(path: String, anchor: Vector2, z_index: int = 0) -> void:
+	var texture := ArtTextureLoaderScript.load_png_texture(path)
+	if texture == null:
+		return
+
+	var sprite := Sprite2D.new()
+	sprite.texture = texture
+	sprite.centered = true
+	sprite.position = anchor
+	sprite.offset = Vector2(0, -float(texture.get_height()) / 2.0)
+	sprite.z_index = z_index
+	_background_root.add_child(sprite)
 
 func _rect(pos: Vector2, size: Vector2, color: Color, parent: Node) -> ColorRect:
 	var rect := ColorRect.new()
