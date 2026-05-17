@@ -44,6 +44,7 @@ func _ready() -> void:
 	pressure.connect("encounter_finished", Callable(self, "_load_scene"))
 
 	_update_scene_guidance(world.scene_data)
+	_update_scene_presentation(world.scene_data)
 	_show_scene_narration(world.scene_data)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -94,6 +95,7 @@ func _load_scene(scene_id: String) -> void:
 
 func _on_scene_loaded(_scene_id: String, scene_data: Dictionary) -> void:
 	_update_scene_guidance(scene_data)
+	_update_scene_presentation(scene_data)
 	_show_scene_narration(scene_data)
 	hud.notify_progress_checkpoint()
 	if alienation_filter != null and alienation_filter.has_method("refresh_checkpoint_state"):
@@ -109,6 +111,12 @@ func _update_scene_guidance(scene_data: Dictionary) -> void:
 	if hud == null or not hud.has_method("set_default_focus_hint"):
 		return
 	hud.set_default_focus_hint(str(scene_data.get("entry_hint", "")))
+
+func _update_scene_presentation(scene_data: Dictionary) -> void:
+	if hud != null:
+		hud.visible = not bool(scene_data.get("hide_hud", false))
+	if alienation_filter != null and alienation_filter.has_method("set_scene_suppressed"):
+		alienation_filter.set_scene_suppressed(bool(scene_data.get("suppress_alienation_filter", false)))
 
 func _gate_dialogue(data: Dictionary) -> String:
 	var interactable_id := str(data.get("id", ""))

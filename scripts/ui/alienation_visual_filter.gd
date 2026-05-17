@@ -31,6 +31,7 @@ var _mode := MODE_NORMAL
 var _current_amount := 0.0
 var _target_amount := 0.0
 var _fade_tween: Tween
+var _scene_suppressed := false
 
 func _ready() -> void:
 	layer = FILTER_LAYER
@@ -40,6 +41,12 @@ func _ready() -> void:
 	refresh_from_state(true)
 
 func refresh_from_state(instant: bool = false) -> void:
+	if _scene_suppressed:
+		_mode = MODE_NORMAL
+		_target_amount = 0.0
+		_fade_to(0.0, 0.0)
+		return
+
 	var game_state := _game_state()
 	if game_state == null or not game_state.has_method("get_alienation_visual_state"):
 		_mode = MODE_NORMAL
@@ -65,6 +72,10 @@ func refresh_from_state(instant: bool = false) -> void:
 
 func refresh_checkpoint_state() -> void:
 	refresh_from_state()
+
+func set_scene_suppressed(value: bool) -> void:
+	_scene_suppressed = value
+	refresh_from_state(value)
 
 func trigger_checkpoint_flash() -> void:
 	refresh_checkpoint_state()

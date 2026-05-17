@@ -27,6 +27,7 @@ func _initialize() -> void:
 	await _check_self_friction_and_pressure_modifier()
 	await _check_final_ending_resolution()
 	await _check_auto_final_ending_dialogue()
+	await _check_final_field_epilogue()
 	await _check_stats_panel_toggle()
 	await _check_success_guidance_targets()
 	await _check_stat_simplification_and_legacy_migration()
@@ -36,6 +37,7 @@ func _initialize() -> void:
 	await _check_ai_cost_button_labels()
 	await _check_alienation_visual_state()
 	await _check_alienation_visual_filter()
+	await _check_final_field_scene_presentation()
 	await _check_ai_dialogue_heart_cost()
 	await _check_non_ai_dialogue_does_not_reduce_heart()
 	await _check_dialogue_choice_triggers_once()
@@ -502,6 +504,52 @@ func _check_auto_final_ending_dialogue() -> void:
 		_failures.append("auto final ending did not persist final_ending")
 	if _game_state().settlement_history.is_empty():
 		_failures.append("auto final ending did not log settlement")
+	if choices.size() > 0:
+		_expect_equal(str(choice.get("next_scene", "")), "final_field_epilogue", "auto final ending should continue into field epilogue")
+
+	dialogue.queue_free()
+	await process_frame
+
+func _check_final_field_epilogue() -> void:
+	_reset_state()
+	var scene: Dictionary = _chapter_data().get_scene("final_field_epilogue")
+	if scene.is_empty():
+		_failures.append("final field epilogue scene missing")
+		return
+	_expect_equal(str(scene.get("theme", "")), "first_person_field", "final field epilogue theme mismatch")
+	if not bool(scene.get("hide_player", false)):
+		_failures.append("final field epilogue should hide the third-person player")
+	if not bool(scene.get("hide_hud", false)):
+		_failures.append("final field epilogue should hide HUD controls")
+	if not bool(scene.get("suppress_alienation_filter", false)):
+		_failures.append("final field epilogue should suppress grayscale alienation filter")
+
+	var dialogue := DialoguePacked.instantiate()
+	root.add_child(dialogue)
+	await process_frame
+
+	_game_state().flags["final_ending"] = "self_return"
+	dialogue.show_dialogue("n_final_field_epilogue")
+	await process_frame
+	var line_label: Label = dialogue.get("_line_label")
+	if line_label == null or not str(line_label.text).contains("风声没有替你总结什么"):
+		_failures.append("self-return field epilogue first page mismatch")
+	dialogue._close_or_advance()
+	await process_frame
+	if line_label == null or not str(line_label.text).contains("完成度报告"):
+		_failures.append("field epilogue did not advance to second page")
+
+	_game_state().flags["final_ending"] = "optimized_life"
+	dialogue.show_dialogue("n_final_field_epilogue")
+	await process_frame
+	if line_label == null or not str(line_label.text).contains("没有被上传的数据"):
+		_failures.append("optimized-life field epilogue should not claim recovered self")
+
+	_game_state().flags["final_ending"] = "coexistence"
+	dialogue.show_dialogue("n_final_field_epilogue")
+	await process_frame
+	if line_label == null or not str(line_label.text).contains("屏幕没有消失"):
+		_failures.append("coexistence field epilogue first page mismatch")
 
 	dialogue.queue_free()
 	await process_frame
@@ -820,6 +868,47 @@ func _check_alienation_visual_filter() -> void:
 	_expect_float_near(filter.get_filter_amount(), 0.0, "normal mode should clear grayscale")
 
 	filter.queue_free()
+	await process_frame
+
+func _check_final_field_scene_presentation() -> void:
+	_reset_state()
+	var main := MainScene.instantiate()
+	root.add_child(main)
+	await process_frame
+	await process_frame
+
+	var world: Node = main.get("world")
+	var hud: CanvasLayer = main.get("hud")
+	var alienation_filter: CanvasLayer = main.get("alienation_filter")
+	if world == null or hud == null or alienation_filter == null:
+		_failures.append("final field presentation modules missing")
+		main.queue_free()
+		await process_frame
+		return
+
+	_game_state().current_chapter_id = "chapter_8"
+	_game_state().stats["heart"] = 25
+	_game_state().stats["ai_dependence"] = 70
+	if alienation_filter.has_method("refresh_from_state"):
+		alienation_filter.refresh_from_state(true)
+	main._load_scene("final_field_epilogue")
+	await process_frame
+
+	_expect_equal(str(world.current_scene_id), "final_field_epilogue", "final field scene did not load")
+	if world.player.visible:
+		_failures.append("final field scene should hide world player")
+	if hud.visible:
+		_failures.append("final field scene should hide HUD")
+	if alienation_filter.has_method("get_visual_mode"):
+		_expect_equal(alienation_filter.get_visual_mode(), "normal", "final field should suppress alienation filter")
+	if alienation_filter.has_method("get_filter_amount"):
+		_expect_float_near(alienation_filter.get_filter_amount(), 0.0, "final field should clear alienation amount")
+
+	var background_root: Node = world.get_node_or_null("Background")
+	if background_root == null or background_root.get_child_count() == 0:
+		_failures.append("final field background did not render")
+
+	main.queue_free()
 	await process_frame
 
 func _check_ai_dialogue_heart_cost() -> void:

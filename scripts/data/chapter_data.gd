@@ -529,6 +529,23 @@ func _build_scenes() -> void:
 				{"id": "future_self", "name": "未来的你", "position": Vector2(1110, 585), "role": "guest"},
 			],
 		},
+			"final_field_epilogue": {
+				"chapter": "chapter_8",
+				"location": "蓝天与田野",
+				"time": "清晨",
+				"objective": "亲自面对这一次选择留下的声音",
+				"entry_hint": "",
+				"narration": "n_final_field_epilogue",
+				"theme": "first_person_field",
+				"ui_overlay": "field_epilogue",
+				"hide_player": true,
+				"hide_hud": true,
+				"suppress_alienation_filter": true,
+				"player_position": Vector2(760, 610),
+				"bounds": Rect2(760, 610, 1, 1),
+				"interactables": [],
+				"npcs": [],
+			},
 	}
 
 func _build_dialogue() -> void:
@@ -616,6 +633,17 @@ func _build_dialogue() -> void:
 		"n_final_overlay": {
 			"speaker": "旁白",
 			"line": "最终总结覆盖在现实之上，像一层干净的玻璃。它没有撒谎，只是太擅长决定什么不必出现。",
+		},
+		"n_final_field_epilogue": {
+			"speaker": "旁白",
+			"line": "",
+			"dynamic_line": "final_field_epilogue",
+			"pages": [
+				"",
+				"",
+				"",
+				"",
+			],
 		},
 		"d_cruise_success": {
 			"speaker": "系统",
@@ -1129,7 +1157,7 @@ func _build_dialogue() -> void:
 						"strategy": STRATEGY_SAFE,
 						"result": "",
 						"effects": {},
-						"next_scene": "",
+						"next_scene": "final_field_epilogue",
 						"profile_weight": 0,
 						"auto_final_ending": true,
 					},
